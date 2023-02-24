@@ -1,5 +1,6 @@
 package nukem.chatroom.service.impl;
 
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import nukem.chatroom.dto.chatroom.ChatRoomDetailedDto;
@@ -39,7 +40,7 @@ public class ChatRoomServiceImpl implements ChatRoomService {
     @Override
     @Transactional(readOnly = true)
     public ChatRoomDetailedDto getChatRoomInfo(final Long id) {
-        return chatRoomRepository.findById(id).map(ChatRoomDetailedDto::toDto).orElseThrow();
+        return chatRoomRepository.findById(id).map(ChatRoomDetailedDto::toDto).orElseThrow(EntityNotFoundException::new);
     }
 
     @Override
@@ -51,7 +52,7 @@ public class ChatRoomServiceImpl implements ChatRoomService {
     @Override
     @Transactional
     public void joinChatRoom(final Long chatRoomId) {
-        final ChatRoom chatRoom = chatRoomRepository.findById(chatRoomId).orElseThrow();
+        final ChatRoom chatRoom = getChatRoom(chatRoomId);
         final User user = authService.getCurrentUser();
         if (chatRoom.getUsers().contains(user)) {
             throw new UserAlreadyInRoomException();
@@ -65,11 +66,15 @@ public class ChatRoomServiceImpl implements ChatRoomService {
     @Override
     @Transactional
     public void leaveChatRoom(final Long chatRoomId) {
-        final ChatRoom chatRoom = chatRoomRepository.findById(chatRoomId).orElseThrow();
+        final ChatRoom chatRoom = getChatRoom(chatRoomId);
         final User user = authService.getCurrentUser();
         chatRoom.getUsers().remove(user);
         chatRoomRepository.save(chatRoom);
         messagingTemplate.convertAndSend("/chatroom" + chatRoomId, user.getUsername() + "has left");
         log.info("{} has left the room {}", user.getUsername(), chatRoom.getName());
+    }
+
+    private ChatRoom getChatRoom(Long chatRoomId) {
+        return chatRoomRepository.findById(chatRoomId).orElseThrow(EntityNotFoundException::new);
     }
 }

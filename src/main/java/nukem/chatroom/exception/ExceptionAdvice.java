@@ -24,6 +24,12 @@ public class ExceptionAdvice {
         return ex.getMessage();
     }
 
+    @ExceptionHandler(UserAlreadyInRoomException.class)
+    @ResponseStatus(value = HttpStatus.CONFLICT)
+    public String handleAlreadyInRoomException(UserAlreadyInRoomException ex) {
+        return ex.getMessage();
+    }
+
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex) {
         Map<String, Object> body = new LinkedHashMap<>();
@@ -44,10 +50,5 @@ public class ExceptionAdvice {
                 .map(ConstraintViolation::getMessage)
                 .collect(Collectors.toList()));
         return new ResponseEntity<>(body, HttpStatus.BAD_REQUEST);
-    }
-
-    @ExceptionHandler(UserAlreadyInRoomException.class)
-    public String handleAlreadyInRoomException(UserAlreadyInRoomException ex) {
-        return ex.getMessage();
     }
 }

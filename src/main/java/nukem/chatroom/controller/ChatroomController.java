@@ -16,7 +16,7 @@ public class ChatroomController {
     private final ChatRoomService chatRoomService;
     private final MessageService messageService;
 
-    @GetMapping("/")
+    @GetMapping
     public ResponseEntity<?> getChatRooms() {
         return ResponseEntity.ok().body(chatRoomService.getChatRooms());
     }

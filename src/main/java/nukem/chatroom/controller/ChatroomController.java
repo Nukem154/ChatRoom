@@ -1,6 +1,7 @@
 package nukem.chatroom.controller;
 
 import lombok.RequiredArgsConstructor;
+import nukem.chatroom.dto.request.CreateRoomRequest;
 import nukem.chatroom.dto.request.MessageRequest;
 import nukem.chatroom.service.ChatRoomService;
 import nukem.chatroom.service.MessageService;
@@ -22,8 +23,8 @@ public class ChatroomController {
     }
 
     @PostMapping
-    public ResponseEntity<?> createChatRoom(@RequestBody String name) {
-        return ResponseEntity.ok().body(chatRoomService.createChatRoom(name));
+    public ResponseEntity<?> createChatRoom(@RequestBody CreateRoomRequest request) {
+        return ResponseEntity.ok().body(chatRoomService.createChatRoom(request));
     }
 
     @GetMapping("/{id}")

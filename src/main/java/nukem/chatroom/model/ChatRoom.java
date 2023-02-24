@@ -37,7 +37,8 @@ public class ChatRoom {
     public ChatRoom() {
     }
 
-    public ChatRoom(String name) {
+    public ChatRoom(String name, String description) {
         this.name = name;
+        this.description = description;
     }
 }

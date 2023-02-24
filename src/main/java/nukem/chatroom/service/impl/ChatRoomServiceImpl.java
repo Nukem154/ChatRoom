@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import nukem.chatroom.dto.chatroom.ChatRoomDetailedDto;
 import nukem.chatroom.dto.chatroom.ChatRoomShortDto;
+import nukem.chatroom.dto.request.CreateRoomRequest;
 import nukem.chatroom.exception.UserAlreadyInRoomException;
 import nukem.chatroom.model.ChatRoom;
 import nukem.chatroom.model.user.User;
@@ -30,8 +31,8 @@ public class ChatRoomServiceImpl implements ChatRoomService {
 
     @Override
     @Transactional
-    public ChatRoom createChatRoom(final String name) {
-        final ChatRoom chatRoom = new ChatRoom(name);
+    public ChatRoom createChatRoom(final CreateRoomRequest request) {
+        final ChatRoom chatRoom = new ChatRoom(request.name(), request.description());
         final ChatRoom savedChatRoom = chatRoomRepository.save(chatRoom);
         joinChatRoom(savedChatRoom.getId());
         return savedChatRoom;

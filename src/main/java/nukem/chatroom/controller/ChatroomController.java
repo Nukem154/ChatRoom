@@ -21,14 +21,14 @@ public class ChatroomController {
         return ResponseEntity.ok().body(chatRoomService.getChatRooms());
     }
 
+    @PostMapping
+    public ResponseEntity<?> createChatRoom(@RequestBody String name) {
+        return ResponseEntity.ok().body(chatRoomService.createChatRoom(name));
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<?> getChatRoomDetailedInfo(@PathVariable Long id) {
         return ResponseEntity.ok().body(chatRoomService.getChatRoomInfo(id));
-    }
-
-    @PostMapping("/{name}")
-    public ResponseEntity<?> createChatRoom(@PathVariable String name) {
-        return ResponseEntity.ok().body(chatRoomService.createChatRoom(name));
     }
 
     @PostMapping("/{chatRoomId}/join")

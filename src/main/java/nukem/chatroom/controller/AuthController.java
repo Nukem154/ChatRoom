@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import nukem.chatroom.dto.request.LoginRequest;
 import nukem.chatroom.dto.request.RegisterRequest;
+import nukem.chatroom.dto.response.LoginResponse;
 import nukem.chatroom.service.TokenService;
 import nukem.chatroom.service.UserService;
 import org.springframework.http.HttpStatus;
@@ -28,11 +29,11 @@ public class AuthController {
     private final UserService userService;
 
     @PostMapping("/login")
-    public String login(@RequestBody LoginRequest userLogin) {
+    public ResponseEntity<LoginResponse> login(@RequestBody LoginRequest userLogin) {
         Authentication authentication =
                 authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(userLogin.username(), userLogin.password()));
         log.debug("User {} authenticated", userLogin.username());
-        return tokenService.generateToken(authentication);
+        return ResponseEntity.ok(new LoginResponse(tokenService.generateToken(authentication)));
     }
 
     @PostMapping("/register")

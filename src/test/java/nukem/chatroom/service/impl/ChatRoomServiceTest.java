@@ -1,5 +1,6 @@
 package nukem.chatroom.service.impl;
 
+import nukem.chatroom.dto.chatroom.ChatRoomDetailedDto;
 import nukem.chatroom.model.ChatRoom;
 import nukem.chatroom.model.user.User;
 import nukem.chatroom.repository.ChatRoomRepository;
@@ -40,7 +41,7 @@ public class ChatRoomServiceTest {
         assertNotNull(savedChatRoom.getId());
         assertEquals(chatRoom.getName(), savedChatRoom.getName());
 
-        ChatRoom retrievedChatRoom = chatRoomService.getChatRoom(savedChatRoom.getId());
+        ChatRoomDetailedDto retrievedChatRoom = chatRoomService.getChatRoomInfo(savedChatRoom.getId());
         assertNotNull(retrievedChatRoom);
         assertEquals(savedChatRoom.getId(), retrievedChatRoom.getId());
         assertEquals(savedChatRoom.getName(), retrievedChatRoom.getName());

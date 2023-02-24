@@ -1,5 +1,7 @@
 package nukem.chatroom.service;
 
+import nukem.chatroom.dto.chatroom.ChatRoomDetailedDto;
+import nukem.chatroom.dto.chatroom.ChatRoomShortDto;
 import nukem.chatroom.model.ChatRoom;
 
 import java.util.List;
@@ -7,9 +9,9 @@ import java.util.List;
 public interface ChatRoomService {
     ChatRoom createChatRoom(String name);
 
-    ChatRoom getChatRoom(Long id);
+    ChatRoomDetailedDto getChatRoomInfo(Long id);
 
-    List<ChatRoom> getChatRooms();
+    List<ChatRoomShortDto> getChatRooms();
 
     void joinChatRoom(Long chatRoomId);
 

@@ -50,9 +50,4 @@ public class ExceptionAdvice {
     public String handleAlreadyInRoomException(UserAlreadyInRoomException ex) {
         return ex.getMessage();
     }
-
-    @ExceptionHandler(Exception.class)
-    public String handleException(Exception ex) {
-        return ex.getMessage();
-    }
 }

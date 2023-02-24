@@ -16,14 +16,14 @@ public class ChatroomController {
     private final ChatRoomService chatRoomService;
     private final MessageService messageService;
 
-    @GetMapping
+    @GetMapping("/")
     public ResponseEntity<?> getChatRooms() {
         return ResponseEntity.ok().body(chatRoomService.getChatRooms());
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<?> getChatRoomInfo(@PathVariable Long id) {
-        return ResponseEntity.ok().body(chatRoomService.getChatRoom(id));
+    public ResponseEntity<?> getChatRoomDetailedInfo(@PathVariable Long id) {
+        return ResponseEntity.ok().body(chatRoomService.getChatRoomInfo(id));
     }
 
     @PostMapping("/{name}")

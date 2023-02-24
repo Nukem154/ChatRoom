@@ -2,6 +2,8 @@ package nukem.chatroom.service.impl;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import nukem.chatroom.dto.chatroom.ChatRoomDetailedDto;
+import nukem.chatroom.dto.chatroom.ChatRoomShortDto;
 import nukem.chatroom.exception.UserAlreadyInRoomException;
 import nukem.chatroom.model.ChatRoom;
 import nukem.chatroom.model.user.User;
@@ -13,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -35,14 +38,14 @@ public class ChatRoomServiceImpl implements ChatRoomService {
 
     @Override
     @Transactional(readOnly = true)
-    public ChatRoom getChatRoom(final Long id) {
-        return chatRoomRepository.findById(id).orElseThrow();
+    public ChatRoomDetailedDto getChatRoomInfo(final Long id) {
+        return chatRoomRepository.findById(id).map(ChatRoomDetailedDto::toDto).orElseThrow();
     }
 
     @Override
     @Transactional(readOnly = true)
-    public List<ChatRoom> getChatRooms() {
-        return chatRoomRepository.findAll();
+    public List<ChatRoomShortDto> getChatRooms() {
+        return chatRoomRepository.findAll().stream().map(ChatRoomShortDto::toDto).collect(Collectors.toList());
     }
 
     @Override

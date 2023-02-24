@@ -16,7 +16,7 @@ public class MessageController {
     private final MessageService messageService;
 
     @GetMapping
-    public ResponseEntity<?> getMessages(@RequestParam(defaultValue = "0") Integer page, @RequestParam(defaultValue = "15") Integer size) {
+    public ResponseEntity<?> getUserMessages(@RequestParam(defaultValue = "0") Integer page, @RequestParam(defaultValue = "15") Integer size) {
         return ResponseEntity.ok(messageService.getUserMessages(PageRequest.of(page, size, Sort.by("date"))));
     }
 

@@ -50,7 +50,7 @@ public class MessageServiceImpl implements MessageService {
                 .user(authService.getCurrentUser())
                 .date(LocalDateTime.now())
                 .build();
-        messagingTemplate.convertAndSend("/chatroom" + chatRoomId, messageRequest.content());
+        messagingTemplate.convertAndSend("/chatroom/" + chatRoomId, messageRequest.content());
         return messageRepository.save(message);
     }
 

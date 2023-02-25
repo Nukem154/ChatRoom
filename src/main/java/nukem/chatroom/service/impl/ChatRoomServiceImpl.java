@@ -60,8 +60,8 @@ public class ChatRoomServiceImpl implements ChatRoomService {
         }
         chatRoom.getUsers().add(user);
         chatRoomRepository.save(chatRoom);
-        messagingTemplate.convertAndSend("/chatroom" + chatRoomId, user.getUsername() + "has joined");
-        log.info("{} has joined the room {}", user.getUsername(), chatRoom.getName());
+        messagingTemplate.convertAndSend("/chatroom/" + chatRoomId, user.getUsername() + " joined the room");
+        log.info("{} joined {} room", user.getUsername(), chatRoom.getName());
     }
 
     @Override
@@ -71,8 +71,8 @@ public class ChatRoomServiceImpl implements ChatRoomService {
         final User user = authService.getCurrentUser();
         chatRoom.getUsers().remove(user);
         chatRoomRepository.save(chatRoom);
-        messagingTemplate.convertAndSend("/chatroom" + chatRoomId, user.getUsername() + "has left");
-        log.info("{} has left the room {}", user.getUsername(), chatRoom.getName());
+        messagingTemplate.convertAndSend("/chatroom/" + chatRoomId, user.getUsername() + " left the room");
+        log.info("{} left {} room", user.getUsername(), chatRoom.getName());
     }
 
     private ChatRoom getChatRoom(Long chatRoomId) {

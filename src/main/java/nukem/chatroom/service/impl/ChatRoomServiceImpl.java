@@ -73,7 +73,7 @@ public class ChatRoomServiceImpl implements ChatRoomService {
                 throw new UserAlreadyInRoomException(user.getUsername());
             }
             chatRoom.getUsers().add(user);
-            messagingTemplate.convertAndSend(CHATROOMS + SLASH + chatRoomId, user.getUsername() + " joined the room");
+            messagingTemplate.convertAndSend(getChatRoomTopic(chatRoomId), getUserJoinMessage(user));
         });
     }
 
@@ -85,7 +85,7 @@ public class ChatRoomServiceImpl implements ChatRoomService {
                 throw new UserNotInRoomException(user.getUsername());
             }
             chatRoom.getUsers().remove(user);
-            messagingTemplate.convertAndSend(CHATROOMS + SLASH + chatRoomId, user.getUsername() + " left the room");
+            messagingTemplate.convertAndSend(getChatRoomTopic(chatRoomId), getUserLeaveMessage(user));
         });
     }
 
@@ -94,5 +94,17 @@ public class ChatRoomServiceImpl implements ChatRoomService {
         final User user = authService.getCurrentUser();
         action.accept(chatRoom, user);
         chatRoomRepository.save(chatRoom);
+    }
+
+    private String getChatRoomTopic(final Long chatRoomId) {
+        return CHATROOMS + SLASH + chatRoomId;
+    }
+
+    private String getUserJoinMessage(final User user) {
+        return user.getUsername() + " joined the room";
+    }
+
+    private String getUserLeaveMessage(final User user) {
+        return user.getUsername() + " left the room";
     }
 }

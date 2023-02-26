@@ -19,6 +19,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Set;
 import java.util.function.BiConsumer;
 import java.util.stream.Collectors;
 
@@ -58,10 +59,10 @@ public class ChatRoomServiceImpl implements ChatRoomService {
     }
 
     @Override
-    public List<String> getActiveUsersInRoom(Long roomId) {
+    public Set<String> getActiveUsersInRoom(Long roomId) {
         return userRegistry.findSubscriptions(subscription -> subscription.getDestination().equals(CHATROOMS + SLASH + roomId)).stream()
                 .map(subscription -> subscription.getSession().getUser().getPrincipal().getName())
-                .toList();
+                .collect(Collectors.toSet());
     }
 
     @Override

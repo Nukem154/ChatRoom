@@ -35,13 +35,13 @@ public class ChatroomController {
     @PostMapping("/{chatRoomId}/join")
     public ResponseEntity<?> joinChatRoom(@PathVariable Long chatRoomId) {
         chatRoomService.joinChatRoom(chatRoomId);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.noContent().build();
     }
 
     @PostMapping("/{chatRoomId}/leave")
     public ResponseEntity<?> leaveChatRoom(@PathVariable Long chatRoomId) {
         chatRoomService.leaveChatRoom(chatRoomId);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/{chatRoomId}/messages")

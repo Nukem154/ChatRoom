@@ -7,6 +7,7 @@ import nukem.chatroom.dto.chatroom.ChatRoomDetailedDto;
 import nukem.chatroom.dto.chatroom.ChatRoomShortDto;
 import nukem.chatroom.dto.request.CreateRoomRequest;
 import nukem.chatroom.exception.UserAlreadyInRoomException;
+import nukem.chatroom.exception.UserNotInRoomException;
 import nukem.chatroom.model.ChatRoom;
 import nukem.chatroom.model.user.User;
 import nukem.chatroom.repository.ChatRoomRepository;
@@ -17,6 +18,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.function.BiConsumer;
 import java.util.stream.Collectors;
 
 @Service
@@ -53,29 +55,31 @@ public class ChatRoomServiceImpl implements ChatRoomService {
     @Override
     @Transactional
     public void joinChatRoom(final Long chatRoomId) {
-        final ChatRoom chatRoom = getChatRoom(chatRoomId);
-        final User user = authService.getCurrentUser();
-        if (chatRoom.getUsers().contains(user)) {
-            throw new UserAlreadyInRoomException();
-        }
-        chatRoom.getUsers().add(user);
-        chatRoomRepository.save(chatRoom);
-        messagingTemplate.convertAndSend("/chatroom/" + chatRoomId, user.getUsername() + " joined the room");
-        log.info("{} joined {} room", user.getUsername(), chatRoom.getName());
+        performChatRoomAction(chatRoomId, (chatRoom, user) -> {
+            if (chatRoom.getUsers().contains(user)) {
+                throw new UserAlreadyInRoomException(user.getUsername());
+            }
+            chatRoom.getUsers().add(user);
+            messagingTemplate.convertAndSend("/chatroom/" + chatRoomId, user.getUsername() + " joined the room");
+        });
     }
 
     @Override
     @Transactional
     public void leaveChatRoom(final Long chatRoomId) {
-        final ChatRoom chatRoom = getChatRoom(chatRoomId);
-        final User user = authService.getCurrentUser();
-        chatRoom.getUsers().remove(user);
-        chatRoomRepository.save(chatRoom);
-        messagingTemplate.convertAndSend("/chatroom/" + chatRoomId, user.getUsername() + " left the room");
-        log.info("{} left {} room", user.getUsername(), chatRoom.getName());
+        performChatRoomAction(chatRoomId, (chatRoom, user) -> {
+            if (!chatRoom.getUsers().contains(user)) {
+                throw new UserNotInRoomException(user.getUsername());
+            }
+            chatRoom.getUsers().remove(user);
+            messagingTemplate.convertAndSend("/chatroom/" + chatRoomId, user.getUsername() + " left the room");
+        });
     }
 
-    private ChatRoom getChatRoom(Long chatRoomId) {
-        return chatRoomRepository.findById(chatRoomId).orElseThrow(EntityNotFoundException::new);
+    private void performChatRoomAction(final Long chatRoomId, final BiConsumer<ChatRoom, User> action) {
+        final ChatRoom chatRoom = chatRoomRepository.findById(chatRoomId).orElseThrow(EntityNotFoundException::new);
+        final User user = authService.getCurrentUser();
+        action.accept(chatRoom, user);
+        chatRoomRepository.save(chatRoom);
     }
 }

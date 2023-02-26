@@ -30,6 +30,12 @@ public class ExceptionAdvice {
         return ex.getMessage();
     }
 
+    @ExceptionHandler(UserNotInRoomException.class)
+    @ResponseStatus(value = HttpStatus.CONFLICT)
+    public String handleUserNotInRoomException(UserNotInRoomException ex) {
+        return ex.getMessage();
+    }
+
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex) {
         Map<String, Object> body = new LinkedHashMap<>();

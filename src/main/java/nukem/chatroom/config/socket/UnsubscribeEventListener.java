@@ -7,6 +7,8 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.messaging.SessionUnsubscribeEvent;
 
+import static nukem.chatroom.constants.Constants.SLASH;
+import static nukem.chatroom.constants.WebSocketURL.CHATROOMS;
 import static nukem.chatroom.constants.WebSocketURL.USERS;
 
 @Component
@@ -18,7 +20,7 @@ public class UnsubscribeEventListener implements ApplicationListener<SessionUnsu
 
     @Override
     public void onApplicationEvent(SessionUnsubscribeEvent event) {
-        final String destination = event.getMessage().getHeaders().get("simpDestination").toString();
+        final String destination = CHATROOMS + SLASH + event.getMessage().getHeaders().get("simpSubscriptionId").toString();
         final String username = event.getUser().getName();
         messagingTemplate.convertAndSend(destination + USERS, "USER UNSUBSCRIBED: " + username);
         log.info("User {} unsubscribed from destination: {}", username, destination);

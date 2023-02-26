@@ -2,7 +2,7 @@ package nukem.chatroom.service.impl;
 
 import lombok.RequiredArgsConstructor;
 import nukem.chatroom.dto.MessageDto;
-import nukem.chatroom.dto.request.MessageRequest;
+import nukem.chatroom.dto.request.SendMessageRequest;
 import nukem.chatroom.model.ChatRoom;
 import nukem.chatroom.model.Message;
 import nukem.chatroom.repository.ChatRoomRepository;
@@ -45,11 +45,11 @@ public class MessageServiceImpl implements MessageService {
 
     @Override
     @Transactional
-    public Message sendMessage(final Long chatRoomId, final MessageRequest messageRequest) {
+    public Message sendMessage(final Long chatRoomId, final SendMessageRequest sendMessageRequest) {
         final ChatRoom chatRoom = chatRoomRepository.findById(chatRoomId).orElseThrow();
         final Message message = Message.builder()
                 .chatRoom(chatRoom)
-                .content(messageRequest.content())
+                .content(sendMessageRequest.content())
                 .user(authService.getCurrentUser())
                 .date(LocalDateTime.now())
                 .build();
@@ -67,10 +67,10 @@ public class MessageServiceImpl implements MessageService {
 
     @Override
     @Transactional
-    public Message editMessage(final Long id, final MessageRequest messageRequest) {
+    public Message editMessage(final Long id, final SendMessageRequest sendMessageRequest) {
         final Message message = messageRepository.findById(id).orElseThrow();
         verifyMessageOwnership(message);
-        message.setContent(messageRequest.content());
+        message.setContent(sendMessageRequest.content());
         return messageRepository.save(message);
     }
 

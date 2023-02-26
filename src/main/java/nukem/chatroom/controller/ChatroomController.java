@@ -2,7 +2,7 @@ package nukem.chatroom.controller;
 
 import lombok.RequiredArgsConstructor;
 import nukem.chatroom.dto.request.CreateRoomRequest;
-import nukem.chatroom.dto.request.MessageRequest;
+import nukem.chatroom.dto.request.SendMessageRequest;
 import nukem.chatroom.service.ChatRoomService;
 import nukem.chatroom.service.MessageService;
 import org.springframework.data.domain.PageRequest;
@@ -56,7 +56,7 @@ public class ChatroomController {
     }
 
     @PostMapping("/{chatRoomId}/messages")
-    public ResponseEntity<?> sendMessage(@PathVariable Long chatRoomId, @RequestBody MessageRequest message) {
+    public ResponseEntity<?> sendMessage(@PathVariable Long chatRoomId, @RequestBody SendMessageRequest message) {
         return ResponseEntity.ok(messageService.sendMessage(chatRoomId, message));
     }
 }

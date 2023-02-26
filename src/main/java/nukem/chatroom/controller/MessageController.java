@@ -1,7 +1,7 @@
 package nukem.chatroom.controller;
 
 import lombok.RequiredArgsConstructor;
-import nukem.chatroom.dto.request.MessageRequest;
+import nukem.chatroom.dto.request.SendMessageRequest;
 import nukem.chatroom.service.MessageService;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
@@ -20,8 +20,8 @@ public class MessageController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> editMessage(@PathVariable Long id, @RequestBody MessageRequest messageRequest) {
-        return ResponseEntity.ok(messageService.editMessage(id, messageRequest));
+    public ResponseEntity<?> editMessage(@PathVariable Long id, @RequestBody SendMessageRequest sendMessageRequest) {
+        return ResponseEntity.ok(messageService.editMessage(id, sendMessageRequest));
     }
 
     @DeleteMapping("/{id}")

@@ -1,4 +1,4 @@
-package nukem.chatroom.config;
+package nukem.chatroom.config.socket;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -21,6 +21,9 @@ import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerCo
 
 import java.util.List;
 
+import static nukem.chatroom.constants.WebSocketURL.CHATROOMS;
+import static nukem.chatroom.constants.WebSocketURL.STOMP;
+
 @Configuration
 @EnableWebSocketMessageBroker
 @RequiredArgsConstructor
@@ -31,13 +34,12 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     @Override
     public void configureMessageBroker(MessageBrokerRegistry config) {
-        config.enableSimpleBroker("/chatroom");
-        config.setApplicationDestinationPrefixes("/app");
+        config.enableSimpleBroker(CHATROOMS);
     }
 
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
-        registry.addEndpoint("/ws").setAllowedOrigins("http://localhost:3000").withSockJS();
+        registry.addEndpoint(STOMP).setAllowedOrigins("http://localhost:3000").withSockJS();
     }
 
     @Override

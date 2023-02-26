@@ -18,4 +18,5 @@ public interface ChatRoomService {
 
     void leaveChatRoom(Long chatRoomId);
 
+    List<String> getActiveUsersInRoom(Long chatRoomId);
 }

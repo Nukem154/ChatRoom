@@ -18,6 +18,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 
+import static nukem.chatroom.constants.Constants.SLASH;
+import static nukem.chatroom.constants.WebSocketURL.CHATROOMS;
+
 @Service
 @RequiredArgsConstructor
 public class MessageServiceImpl implements MessageService {
@@ -50,7 +53,7 @@ public class MessageServiceImpl implements MessageService {
                 .user(authService.getCurrentUser())
                 .date(LocalDateTime.now())
                 .build();
-        messagingTemplate.convertAndSend("/chatroom/" + chatRoomId, MessageDto.toDto(message));
+        messagingTemplate.convertAndSend(CHATROOMS + SLASH + chatRoomId, MessageDto.toDto(message));
         return messageRepository.save(message);
     }
 

@@ -32,6 +32,11 @@ public class ChatroomController {
         return ResponseEntity.ok().body(chatRoomService.getChatRoomInfo(id));
     }
 
+    @GetMapping("/{id}/users")
+    public ResponseEntity<?> getActiveUsers(@PathVariable Long id) {
+        return ResponseEntity.ok().body(chatRoomService.getActiveUsersInRoom(id));
+    }
+
     @PostMapping("/{chatRoomId}/join")
     public ResponseEntity<?> joinChatRoom(@PathVariable Long chatRoomId) {
         chatRoomService.joinChatRoom(chatRoomId);

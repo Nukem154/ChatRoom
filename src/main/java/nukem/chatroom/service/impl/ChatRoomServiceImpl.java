@@ -14,12 +14,16 @@ import nukem.chatroom.repository.ChatRoomRepository;
 import nukem.chatroom.service.AuthService;
 import nukem.chatroom.service.ChatRoomService;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.messaging.simp.user.SimpUserRegistry;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.function.BiConsumer;
 import java.util.stream.Collectors;
+
+import static nukem.chatroom.constants.Constants.SLASH;
+import static nukem.chatroom.constants.WebSocketURL.CHATROOMS;
 
 @Service
 @RequiredArgsConstructor
@@ -29,6 +33,7 @@ public class ChatRoomServiceImpl implements ChatRoomService {
     private final ChatRoomRepository chatRoomRepository;
     private final AuthService authService;
     private final SimpMessagingTemplate messagingTemplate;
+    private final SimpUserRegistry userRegistry;
 
 
     @Override
@@ -53,6 +58,13 @@ public class ChatRoomServiceImpl implements ChatRoomService {
     }
 
     @Override
+    public List<String> getActiveUsersInRoom(Long roomId) {
+        return userRegistry.findSubscriptions(subscription -> subscription.getDestination().equals(CHATROOMS + SLASH + roomId)).stream()
+                .map(subscription -> subscription.getSession().getUser().getPrincipal().getName())
+                .toList();
+    }
+
+    @Override
     @Transactional
     public void joinChatRoom(final Long chatRoomId) {
         performChatRoomAction(chatRoomId, (chatRoom, user) -> {
@@ -60,7 +72,7 @@ public class ChatRoomServiceImpl implements ChatRoomService {
                 throw new UserAlreadyInRoomException(user.getUsername());
             }
             chatRoom.getUsers().add(user);
-            messagingTemplate.convertAndSend("/chatroom/" + chatRoomId, user.getUsername() + " joined the room");
+            messagingTemplate.convertAndSend(CHATROOMS + SLASH + chatRoomId, user.getUsername() + " joined the room");
         });
     }
 
@@ -72,7 +84,7 @@ public class ChatRoomServiceImpl implements ChatRoomService {
                 throw new UserNotInRoomException(user.getUsername());
             }
             chatRoom.getUsers().remove(user);
-            messagingTemplate.convertAndSend("/chatroom/" + chatRoomId, user.getUsername() + " left the room");
+            messagingTemplate.convertAndSend(CHATROOMS + SLASH + chatRoomId, user.getUsername() + " left the room");
         });
     }
 

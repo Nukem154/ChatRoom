@@ -59,7 +59,7 @@ public class ChatRoomServiceImpl implements ChatRoomService {
     }
 
     @Override
-    public Set<String> getActiveUsersInRoom(Long roomId) {
+    public Set<String> getActiveUsersInRoom(final Long roomId) {
         return userRegistry.findSubscriptions(subscription -> subscription.getDestination().equals(CHATROOMS + SLASH + roomId)).stream()
                 .map(subscription -> subscription.getSession().getUser().getPrincipal().getName())
                 .collect(Collectors.toSet());

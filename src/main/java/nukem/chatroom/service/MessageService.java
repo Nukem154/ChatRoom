@@ -7,7 +7,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 
 public interface MessageService {
-    Page<Message> getUserMessages(PageRequest pageRequest);
+    Page<Message> getUserMessagesOrderByIdDesc(PageRequest pageRequest);
 
     Message sendMessage(Long chatRoomId, MessageRequest message);
 

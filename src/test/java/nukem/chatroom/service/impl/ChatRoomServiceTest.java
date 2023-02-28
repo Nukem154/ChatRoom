@@ -1,6 +1,7 @@
 package nukem.chatroom.service.impl;
 
 import nukem.chatroom.dto.chatroom.ChatRoomDetailedDto;
+import nukem.chatroom.dto.request.CreateRoomRequest;
 import nukem.chatroom.model.ChatRoom;
 import nukem.chatroom.model.user.User;
 import nukem.chatroom.repository.ChatRoomRepository;
@@ -28,18 +29,21 @@ public class ChatRoomServiceTest {
     private ChatRoomRepository chatRoomRepository;
 
     private ChatRoom chatRoom;
+    private final String roomName = "Test Room";
+    private final String roomDescription = "Test Description";
 
     @Test
     @Transactional
     public void testCreateChatRoom() {
         setupAuthentication();
 
-        String roomName = "Test Room";
-        ChatRoom chatRoom = new ChatRoom(roomName);
-        ChatRoom savedChatRoom = chatRoomService.createChatRoom(roomName);
+        ChatRoom chatRoom = new ChatRoom(roomName, roomDescription);
+
+        ChatRoom savedChatRoom = chatRoomService.createChatRoom(new CreateRoomRequest(roomName, roomDescription));
 
         assertNotNull(savedChatRoom.getId());
         assertEquals(chatRoom.getName(), savedChatRoom.getName());
+        assertEquals(chatRoom.getDescription(), savedChatRoom.getDescription());
 
         ChatRoomDetailedDto retrievedChatRoom = chatRoomService.getChatRoomInfo(savedChatRoom.getId());
         assertNotNull(retrievedChatRoom);
@@ -105,7 +109,7 @@ public class ChatRoomServiceTest {
 
     private void setupChatroom() {
         // create a chat room and join the user to it
-        chatRoom = chatRoomRepository.save(new ChatRoom("Test Room"));
+        chatRoom = chatRoomRepository.save(new ChatRoom(roomName, roomDescription));
     }
 
 }

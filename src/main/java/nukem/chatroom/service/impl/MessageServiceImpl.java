@@ -3,6 +3,8 @@ package nukem.chatroom.service.impl;
 import lombok.RequiredArgsConstructor;
 import nukem.chatroom.dto.MessageDto;
 import nukem.chatroom.dto.request.SendMessageRequest;
+import nukem.chatroom.enums.headers.EventType;
+import nukem.chatroom.enums.headers.Header;
 import nukem.chatroom.model.ChatRoom;
 import nukem.chatroom.model.Message;
 import nukem.chatroom.repository.ChatRoomRepository;
@@ -17,10 +19,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.Collections;
 
 import static nukem.chatroom.constants.Constants.SLASH;
 import static nukem.chatroom.constants.WebSocketURL.CHATROOMS;
-import static nukem.chatroom.constants.WebSocketURL.MESSAGES;
 
 @Service
 @RequiredArgsConstructor
@@ -55,7 +57,8 @@ public class MessageServiceImpl implements MessageService {
                 .user(authService.getCurrentUser())
                 .date(LocalDateTime.now())
                 .build();
-        messagingTemplate.convertAndSend(CHATROOMS + SLASH + chatRoomId + MESSAGES, MessageDto.toDto(message));
+        messagingTemplate.convertAndSend(CHATROOMS + SLASH + chatRoomId, MessageDto.toDto(message),
+                Collections.singletonMap(Header.EVENT_TYPE.getValue(), EventType.CHAT_MESSAGE.getValue()));
         return messageRepository.save(message);
     }
 
@@ -64,6 +67,8 @@ public class MessageServiceImpl implements MessageService {
     public void deleteMessage(final Long id) {
         final Message message = messageRepository.findById(id).orElseThrow();
         verifyMessageOwnership(message);
+        messagingTemplate.convertAndSend(CHATROOMS + SLASH + message.getChatRoom().getId(), MessageDto.toDto(message),
+                Collections.singletonMap(Header.EVENT_TYPE.getValue(), EventType.CHAT_MESSAGE_DELETE.getValue()));
         messageRepository.delete(message);
     }
 
@@ -73,6 +78,8 @@ public class MessageServiceImpl implements MessageService {
         final Message message = messageRepository.findById(id).orElseThrow();
         verifyMessageOwnership(message);
         message.setContent(sendMessageRequest.content());
+        messagingTemplate.convertAndSend(CHATROOMS + SLASH + message.getChatRoom().getId(), MessageDto.toDto(message),
+                Collections.singletonMap(Header.EVENT_TYPE.getValue(), EventType.CHAT_MESSAGE_EDIT.getValue()));
         return messageRepository.save(message);
     }
 

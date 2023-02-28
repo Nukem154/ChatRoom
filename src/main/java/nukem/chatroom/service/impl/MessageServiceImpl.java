@@ -20,12 +20,14 @@ import java.time.LocalDateTime;
 
 import static nukem.chatroom.constants.Constants.SLASH;
 import static nukem.chatroom.constants.WebSocketURL.CHATROOMS;
+import static nukem.chatroom.constants.WebSocketURL.MESSAGES;
 
 @Service
 @RequiredArgsConstructor
 public class MessageServiceImpl implements MessageService {
 
     public static final String YOU_CAN_EDIT_DELETE_ONLY_YOUR_MESSAGES = "You can edit/delete only your messages";
+
     private final AuthService authService;
     private final MessageRepository messageRepository;
     private final ChatRoomRepository chatRoomRepository;
@@ -53,7 +55,7 @@ public class MessageServiceImpl implements MessageService {
                 .user(authService.getCurrentUser())
                 .date(LocalDateTime.now())
                 .build();
-        messagingTemplate.convertAndSend(CHATROOMS + SLASH + chatRoomId, MessageDto.toDto(message));
+        messagingTemplate.convertAndSend(CHATROOMS + SLASH + chatRoomId + MESSAGES, MessageDto.toDto(message));
         return messageRepository.save(message);
     }
 

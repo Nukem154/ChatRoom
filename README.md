@@ -39,8 +39,8 @@ Example response from `/login` endpoint:
 
 ### Messages
 - `GET /messages`:  Returns the user's messages.
-- `PUT /messages/{messageId}`: Updates a message in a specific chatroom.
-- `DELETE /messages/{messageId}`: Deletes a message from a specific chatroom.
+- `PUT /messages/{messageId}`: Updates message.
+- `DELETE /messages/{messageId}`: Deletes message.
 
 ## Websockets
 

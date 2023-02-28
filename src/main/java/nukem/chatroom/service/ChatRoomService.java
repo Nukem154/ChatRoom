@@ -6,6 +6,7 @@ import nukem.chatroom.dto.request.CreateRoomRequest;
 import nukem.chatroom.model.ChatRoom;
 
 import java.util.List;
+import java.util.Set;
 
 public interface ChatRoomService {
     ChatRoom createChatRoom(CreateRoomRequest request);
@@ -18,4 +19,5 @@ public interface ChatRoomService {
 
     void leaveChatRoom(Long chatRoomId);
 
+    Set<String> getActiveUsersInRoom(Long chatRoomId);
 }

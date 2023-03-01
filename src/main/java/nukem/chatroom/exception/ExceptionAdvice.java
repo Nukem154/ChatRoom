@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import java.time.LocalDateTime;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 
 @RestControllerAdvice
@@ -33,6 +34,12 @@ public class ExceptionAdvice {
     @ExceptionHandler(UserNotInRoomException.class)
     @ResponseStatus(value = HttpStatus.CONFLICT)
     public String handleUserNotInRoomException(UserNotInRoomException ex) {
+        return ex.getMessage();
+    }
+
+    @ExceptionHandler(NoSuchElementException.class)
+    @ResponseStatus(value = HttpStatus.NOT_FOUND)
+    public String handleNoSuchElementException(NoSuchElementException ex) {
         return ex.getMessage();
     }
 

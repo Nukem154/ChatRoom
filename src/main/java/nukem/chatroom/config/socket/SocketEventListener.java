@@ -14,7 +14,6 @@ import java.util.Collections;
 
 import static nukem.chatroom.constants.Constants.SLASH;
 import static nukem.chatroom.constants.WebSocketURL.CHATROOMS;
-import static nukem.chatroom.constants.WebSocketURL.USERS;
 
 @Component
 @RequiredArgsConstructor
@@ -27,17 +26,17 @@ public class SocketEventListener {
     public void handleSessionSubscribeEvent(SessionSubscribeEvent event) {
         final String destination = event.getMessage().getHeaders().get("simpDestination").toString();
         final String username = event.getUser().getName();
-        messagingTemplate.convertAndSend(destination + USERS, username,
+        messagingTemplate.convertAndSend(destination, username,
                 Collections.singletonMap(Header.EVENT_TYPE.getValue(), EventType.SUBSCRIBE_EVENT.getValue()));
-        log.info("User {} subscribed to destination: {}", username, destination);
+        log.debug("User {} subscribed to destination: {}", username, destination);
     }
 
     @EventListener
     public void handleSessionUnsubscribeEvent(SessionUnsubscribeEvent event) {
         final String destination = CHATROOMS + SLASH + event.getMessage().getHeaders().get("simpSubscriptionId").toString();
         final String username = event.getUser().getName();
-        messagingTemplate.convertAndSend(destination + USERS, username,
+        messagingTemplate.convertAndSend(destination, username,
                 Collections.singletonMap(Header.EVENT_TYPE.getValue(), EventType.UNSUBSCRIBE_EVENT.getValue()));
-        log.info("User {} unsubscribed from destination: {}", username, destination);
+        log.debug("User {} unsubscribed from destination: {}", username, destination);
     }
 }

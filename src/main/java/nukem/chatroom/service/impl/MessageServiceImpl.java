@@ -57,9 +57,10 @@ public class MessageServiceImpl implements MessageService {
                 .user(authService.getCurrentUser())
                 .date(LocalDateTime.now())
                 .build();
-        messagingTemplate.convertAndSend(CHATROOMS + SLASH + chatRoomId, MessageDto.toDto(message),
+        final Message savedMessage = messageRepository.save(message);
+        messagingTemplate.convertAndSend(CHATROOMS + SLASH + chatRoomId, MessageDto.toDto(savedMessage),
                 Collections.singletonMap(Header.EVENT_TYPE.getValue(), EventType.CHAT_MESSAGE.getValue()));
-        return messageRepository.save(message);
+        return savedMessage;
     }
 
     @Override

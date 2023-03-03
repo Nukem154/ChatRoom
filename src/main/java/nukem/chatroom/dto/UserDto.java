@@ -3,7 +3,10 @@ package nukem.chatroom.dto;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
+import nukem.chatroom.model.user.Avatar;
 import nukem.chatroom.model.user.User;
+
+import java.util.Optional;
 
 @Getter
 @Setter
@@ -17,7 +20,7 @@ public class UserDto {
         return UserDto.builder()
                 .id(user.getId())
                 .username(user.getUsername())
-                .avatarUrl(user.getAvatar().getUrl())
+                .avatarUrl(user.getAvatar() != null ? user.getAvatar().getUrl() : null)
                 .build();
     }
 }

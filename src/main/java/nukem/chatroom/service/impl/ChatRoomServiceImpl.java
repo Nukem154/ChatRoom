@@ -49,7 +49,11 @@ public class ChatRoomServiceImpl implements ChatRoomService {
     @Override
     @Transactional(readOnly = true)
     public ChatRoomDetailedDto getChatRoomInfo(final Long id) {
-        return chatRoomRepository.findById(id).map(ChatRoomDetailedDto::toDto).orElseThrow(EntityNotFoundException::new);
+        return chatRoomRepository.findById(id).map(chatRoom -> {
+            var dto = ChatRoomDetailedDto.toDto(chatRoom);
+            dto.setUsers(getActiveUsersInRoom(id));
+            return dto;
+        }).orElseThrow(EntityNotFoundException::new);
     }
 
     @Override

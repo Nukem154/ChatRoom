@@ -3,10 +3,7 @@ package nukem.chatroom.dto;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
-import nukem.chatroom.model.user.Avatar;
 import nukem.chatroom.model.user.User;
-
-import java.util.Optional;
 
 @Getter
 @Setter
@@ -20,7 +17,8 @@ public class UserDto {
         return UserDto.builder()
                 .id(user.getId())
                 .username(user.getUsername())
-                .avatarUrl(user.getAvatar() != null ? user.getAvatar().getUrl() : null)
+//                .avatarUrl(user.getAvatar() != null ? user.getAvatar().getUrl() : null)
+                .avatarUrl("https://upload.wikimedia.org/wikipedia/commons/9/96/Dora_%282020-12-22%29.jpg")
                 .build();
     }
 }

@@ -59,4 +59,10 @@ public class ChatroomController {
     public ResponseEntity<?> sendMessage(@PathVariable Long chatRoomId, @RequestBody SendMessageRequest message) {
         return ResponseEntity.ok(messageService.sendMessage(chatRoomId, message));
     }
+
+    @GetMapping("/{chatRoomId}/stream")
+    public ResponseEntity<?> changeStreamState(@PathVariable Long chatRoomId) {
+        chatRoomService.changeStreamState(chatRoomId);
+        return ResponseEntity.ok().build();
+    }
 }

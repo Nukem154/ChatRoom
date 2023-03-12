@@ -22,6 +22,8 @@ public class ChatRoom {
 
     private String description;
 
+    private boolean isStreamOn;
+
     @JsonBackReference
     @ManyToMany
     @JoinTable(

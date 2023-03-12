@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import nukem.chatroom.dto.chatroom.ChatRoomDetailedDto;
 import nukem.chatroom.dto.chatroom.ChatRoomShortDto;
 import nukem.chatroom.dto.request.CreateRoomRequest;
+import nukem.chatroom.enums.headers.EventType;
 import nukem.chatroom.exception.UserAlreadyInRoomException;
 import nukem.chatroom.exception.UserNotInRoomException;
 import nukem.chatroom.model.ChatRoom;
@@ -68,6 +69,14 @@ public class ChatRoomServiceImpl implements ChatRoomService {
         return userRegistry.findSubscriptions(subscription -> subscription.getDestination().equals(CHATROOMS + SLASH + roomId)).stream()
                 .map(subscription -> subscription.getSession().getUser().getName())
                 .collect(Collectors.toSet());
+    }
+
+    @Override
+    public void changeStreamState(final Long chatRoomId) {
+        final ChatRoom chatRoom = chatRoomRepository.findById(chatRoomId).orElseThrow();
+        chatRoom.setStreamOn(!chatRoom.isStreamOn());
+        chatRoomRepository.save(chatRoom);
+        messagingTemplate.convertAndSend(getChatRoomTopic(chatRoomId), EventType.STREAM_EVENT.getValue());
     }
 
     @Override

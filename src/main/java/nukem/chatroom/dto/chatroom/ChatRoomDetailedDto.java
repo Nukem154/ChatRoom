@@ -15,12 +15,14 @@ public class ChatRoomDetailedDto {
     private String name;
     private String description;
     private Set<String> users;
+    private boolean isStreamOn;
 
     public static ChatRoomDetailedDto toDto(final ChatRoom chatRoom) {
         return ChatRoomDetailedDto.builder()
                 .id(chatRoom.getId())
                 .name(chatRoom.getName())
                 .description(chatRoom.getDescription())
+                .isStreamOn(chatRoom.isStreamOn())
                 .build();
     }
 }

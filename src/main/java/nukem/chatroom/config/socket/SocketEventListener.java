@@ -26,17 +26,29 @@ public class SocketEventListener {
     public void handleSessionSubscribeEvent(SessionSubscribeEvent event) {
         final String destination = event.getMessage().getHeaders().get("simpDestination").toString();
         final String username = event.getUser().getName();
-        messagingTemplate.convertAndSend(destination, username,
-                Collections.singletonMap(Header.EVENT_TYPE.getValue(), EventType.SUBSCRIBE_EVENT.getValue()));
-        log.debug("User {} subscribed to destination: {}", username, destination);
+
+        if(isChatroomDestination(destination)) {
+            messagingTemplate.convertAndSend(destination, username,
+                    Collections.singletonMap(Header.EVENT_TYPE.getValue(), EventType.SUBSCRIBE_EVENT.getValue()));
+            log.debug("User {} subscribed to destination: {}", username, destination);
+        }
     }
 
     @EventListener
     public void handleSessionUnsubscribeEvent(SessionUnsubscribeEvent event) {
         final String destination = CHATROOMS + SLASH + event.getMessage().getHeaders().get("simpSubscriptionId").toString();
         final String username = event.getUser().getName();
-        messagingTemplate.convertAndSend(destination, username,
-                Collections.singletonMap(Header.EVENT_TYPE.getValue(), EventType.UNSUBSCRIBE_EVENT.getValue()));
-        log.debug("User {} unsubscribed from destination: {}", username, destination);
+
+        if(isChatroomDestination(destination)){
+            messagingTemplate.convertAndSend(destination, username,
+                    Collections.singletonMap(Header.EVENT_TYPE.getValue(), EventType.UNSUBSCRIBE_EVENT.getValue()));
+            log.debug("User {} unsubscribed from destination: {}", username, destination);
+        }
+    }
+
+
+    private boolean isChatroomDestination(final String destination) {
+        final String[] segments = destination.split("/");
+        return segments.length == 3 && segments[1].equals("chatrooms");
     }
 }

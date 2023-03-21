@@ -20,6 +20,4 @@ public interface ChatRoomService {
     void leaveChatRoom(Long chatRoomId);
 
     Set<String> getActiveUsersInRoom(Long chatRoomId);
-
-    void changeStreamState(Long chatRoomId);
 }

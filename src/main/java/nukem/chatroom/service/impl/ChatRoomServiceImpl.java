@@ -6,8 +6,6 @@ import lombok.extern.slf4j.Slf4j;
 import nukem.chatroom.dto.chatroom.ChatRoomDetailedDto;
 import nukem.chatroom.dto.chatroom.ChatRoomShortDto;
 import nukem.chatroom.dto.request.CreateRoomRequest;
-import nukem.chatroom.enums.headers.EventType;
-import nukem.chatroom.enums.headers.Header;
 import nukem.chatroom.exception.UserAlreadyInRoomException;
 import nukem.chatroom.exception.UserNotInRoomException;
 import nukem.chatroom.model.ChatRoom;
@@ -20,7 +18,6 @@ import org.springframework.messaging.simp.user.SimpUserRegistry;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.function.BiConsumer;
@@ -74,15 +71,6 @@ public class ChatRoomServiceImpl implements ChatRoomService {
     }
 
     @Override
-    public void changeStreamState(final Long chatRoomId) {
-        final ChatRoom chatRoom = chatRoomRepository.findById(chatRoomId).orElseThrow();
-        chatRoom.setStreamOn(!chatRoom.isStreamOn());
-        chatRoomRepository.save(chatRoom);
-        messagingTemplate.convertAndSend(getChatRoomTopic(chatRoomId), authService.getCurrentUser().getUsername(),
-                Collections.singletonMap(Header.EVENT_TYPE.getValue(), EventType.STREAM_EVENT.getValue()));
-    }
-
-    @Override
     @Transactional
     public void joinChatRoom(final Long chatRoomId) {
         performChatRoomAction(chatRoomId, (chatRoom, user) -> {
@@ -113,7 +101,7 @@ public class ChatRoomServiceImpl implements ChatRoomService {
         chatRoomRepository.save(chatRoom);
     }
 
-    private String getChatRoomTopic(final Long chatRoomId) {
+    public static String getChatRoomTopic(final Long chatRoomId) {
         return CHATROOMS + SLASH + chatRoomId;
     }
 

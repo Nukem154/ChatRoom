@@ -3,6 +3,7 @@ package nukem.chatroom.service.impl;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import nukem.chatroom.dto.UserDto;
 import nukem.chatroom.dto.chatroom.ChatRoomDetailedDto;
 import nukem.chatroom.dto.chatroom.ChatRoomShortDto;
 import nukem.chatroom.dto.request.CreateRoomRequest;
@@ -19,8 +20,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.function.BiConsumer;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static nukem.chatroom.constants.Constants.SLASH;
@@ -50,24 +53,40 @@ public class ChatRoomServiceImpl implements ChatRoomService {
     @Transactional(readOnly = true)
     public ChatRoomDetailedDto getChatRoomInfo(final Long id) {
         return chatRoomRepository.findById(id).map(chatRoom -> {
-            var dto = ChatRoomDetailedDto.toDto(chatRoom);
-            dto.setUsers(getActiveUsersInRoom(id));
-            return dto;
+            var chatRoomDetailedDto = ChatRoomDetailedDto.toDto(chatRoom);
+            chatRoomDetailedDto.setUsers(getActiveUsersDto(id, chatRoom));
+            return chatRoomDetailedDto;
         }).orElseThrow(EntityNotFoundException::new);
+    }
+
+    private Set<UserDto> getActiveUsersDto(final Long id, final ChatRoom chatRoom) {
+        final Set<UserDto> usersDto = getActiveUsersInRoom(id).stream()
+                .map(username -> UserDto.builder().username(username).build())
+                .collect(Collectors.toSet());
+
+        final Map<String, UserDto> userDtoMap = usersDto.stream()
+                .collect(Collectors.toMap(UserDto::getUsername, Function.identity()));
+
+        chatRoom.getStreams().forEach(stream -> {
+            UserDto userDto = userDtoMap.get(stream.getUser().getUsername());
+            if (userDto != null) {
+                userDto.setUserStreaming(true);
+            }
+        });
+        return usersDto;
+    }
+
+    private Set<String> getActiveUsersInRoom(final Long roomId) {
+        return userRegistry.findSubscriptions(subscription -> subscription.getDestination().equals(CHATROOMS + SLASH + roomId))
+                .stream()
+                .map(subscription -> subscription.getSession().getUser().getName())
+                .collect(Collectors.toSet());
     }
 
     @Override
     @Transactional(readOnly = true)
     public List<ChatRoomShortDto> getChatRooms() {
         return chatRoomRepository.findAll().stream().map(ChatRoomShortDto::toDto).collect(Collectors.toList());
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public Set<String> getActiveUsersInRoom(final Long roomId) {
-        return userRegistry.findSubscriptions(subscription -> subscription.getDestination().equals(CHATROOMS + SLASH + roomId)).stream()
-                .map(subscription -> subscription.getSession().getUser().getName())
-                .collect(Collectors.toSet());
     }
 
     @Override

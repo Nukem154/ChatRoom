@@ -6,63 +6,63 @@ import nukem.chatroom.enums.headers.EventType;
 import nukem.chatroom.service.StreamService;
 import nukem.chatroom.service.WebsocketService;
 import org.springframework.context.event.EventListener;
+import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.messaging.SessionDisconnectEvent;
 import org.springframework.web.socket.messaging.SessionSubscribeEvent;
 import org.springframework.web.socket.messaging.SessionUnsubscribeEvent;
 
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
-
-import static nukem.chatroom.constants.Constants.SLASH;
-import static nukem.chatroom.constants.WebSocketURL.CHATROOMS;
 import static nukem.chatroom.constants.WebSocketURL.STREAMER;
 
 @Component
 @RequiredArgsConstructor
 @Slf4j
 public class WebsocketEventListener {
-    private final ConcurrentHashMap<String, Set<String>> subscriptions = new ConcurrentHashMap<>();
 
+    private final SubscriptionTracker subscriptionTracker;
     private final StreamService streamService;
     private final WebsocketService websocketService;
 
     @EventListener
     public void handleSessionSubscribeEvent(SessionSubscribeEvent event) {
-        final String destination = event.getMessage().getHeaders().get("simpDestination").toString();
-        final String username = event.getUser().getName();
+        final String destination = SimpMessageHeaderAccessor.wrap(event.getMessage()).getDestination();
 
-        if (isChatroomDestination(destination)) {
-            websocketService.notifyWebsocketSubscribers(destination, username, EventType.SUBSCRIBE_EVENT);
-            log.debug("User {} subscribed to destination: {}", username, destination);
-        }
+        if (destination != null) {
+            final String username = event.getUser().getName();
 
-        if (isStreamerDestination(destination)) {
-            subscriptions.computeIfAbsent(STREAMER, k -> ConcurrentHashMap.newKeySet()).add(username);
-        }
-    }
-
-    @EventListener
-    public void handleSessionUnsubscribeEvent(SessionUnsubscribeEvent event) {
-        final String destination = CHATROOMS + SLASH + event.getMessage().getHeaders().get("simpSubscriptionId").toString();
-        final String username = event.getUser().getName();
-
-        if (isChatroomDestination(destination)) {
-            websocketService.notifyWebsocketSubscribers(destination, username, EventType.UNSUBSCRIBE_EVENT);
-            log.debug("User {} unsubscribed from destination: {}", username, destination);
-        }
-
-        if (isStreamerDestination(destination) && subscriptions.containsKey(STREAMER)) {
-            subscriptions.get(STREAMER).remove(username);
-        }
-    }
-
-    @EventListener
-    public void handleSessionDisconnectEvent(SessionDisconnectEvent event) {
-        if (subscriptions.get(STREAMER) != null) {
-            if (subscriptions.get(STREAMER).contains(event.getUser().getName())) {
-                streamService.endStream(event.getUser().getName());
+            if (isChatroomDestination(destination)) {
+                websocketService.notifyWebsocketSubscribers(destination, username, EventType.SUBSCRIBE_EVENT);
+                log.debug("User {} subscribed to destination: {}", username, destination);
+            } else if (isStreamerDestination(destination)) {
+                subscriptionTracker.addSubscriber(STREAMER, username);
             }
+        }
+    }
+
+    @EventListener
+    public void handleSessionUnsubscribeEvent(final SessionUnsubscribeEvent event) {
+        final String destination = SimpMessageHeaderAccessor.wrap(event.getMessage()).getSubscriptionId();
+
+        if (destination != null) {
+            final String username = event.getUser().getName();
+
+            if (isChatroomDestination(destination)) {
+                websocketService.notifyWebsocketSubscribers(destination, username, EventType.UNSUBSCRIBE_EVENT);
+                log.debug("User {} unsubscribed from destination: {}", username, destination);
+            } else if (isStreamerDestination(destination)) {
+                subscriptionTracker.removeSubscriber(STREAMER, username);
+            }
+        }
+    }
+
+    @EventListener
+    public void handleSessionDisconnectEvent(final SessionDisconnectEvent event) {
+        endStreamIfNeeded(event.getUser().getName());
+    }
+
+    private void endStreamIfNeeded(String username) {
+        if (subscriptionTracker.isSubscriber(STREAMER, username)) {
+            streamService.endStream(username);
         }
     }
 

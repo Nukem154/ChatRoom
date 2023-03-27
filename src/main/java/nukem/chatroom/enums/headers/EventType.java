@@ -5,7 +5,9 @@ public enum EventType {
     CHAT_MESSAGE_EDIT("chat-message-edit"),
     CHAT_MESSAGE_DELETE("chat-message-delete"),
     SUBSCRIBE_EVENT("subscribe-event"),
-    UNSUBSCRIBE_EVENT("unsubscribe-event");
+    UNSUBSCRIBE_EVENT("unsubscribe-event"),
+    STREAM_STARTED_EVENT("stream-started-event"),
+    STREAM_ENDED_EVENT("stream-ended-event");
 
     private final String value;
 

@@ -22,6 +22,9 @@ public class ChatRoom {
 
     private String description;
 
+    @OneToMany(mappedBy = "chatRoom", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private Set<Stream> streams;
+
     @JsonBackReference
     @ManyToMany
     @JoinTable(

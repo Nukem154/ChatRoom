@@ -1,12 +1,11 @@
 package nukem.chatroom.controller;
 
 import lombok.RequiredArgsConstructor;
+import nukem.chatroom.dto.UserDto;
+import nukem.chatroom.service.AuthService;
 import nukem.chatroom.service.UserService;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 @RestController
@@ -15,6 +14,12 @@ import org.springframework.web.multipart.MultipartFile;
 public class UserController {
 
     private final UserService userService;
+    private final AuthService authService;
+
+    @GetMapping
+    public ResponseEntity<UserDto> getCurrentUser() {
+        return ResponseEntity.ok(UserDto.toDto(authService.getCurrentUser()));
+    }
 
     @PostMapping("/avatar")
     public ResponseEntity<String> updateAvatar(@RequestParam("image") MultipartFile file) {

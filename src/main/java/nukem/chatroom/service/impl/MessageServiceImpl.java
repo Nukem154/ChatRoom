@@ -4,25 +4,22 @@ import lombok.RequiredArgsConstructor;
 import nukem.chatroom.dto.MessageDto;
 import nukem.chatroom.dto.request.SendMessageRequest;
 import nukem.chatroom.enums.headers.EventType;
-import nukem.chatroom.enums.headers.Header;
 import nukem.chatroom.model.ChatRoom;
 import nukem.chatroom.model.Message;
 import nukem.chatroom.repository.ChatRoomRepository;
 import nukem.chatroom.repository.MessageRepository;
 import nukem.chatroom.service.AuthService;
 import nukem.chatroom.service.MessageService;
+import nukem.chatroom.service.WebsocketService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.Collections;
 
-import static nukem.chatroom.constants.Constants.SLASH;
-import static nukem.chatroom.constants.WebSocketURL.CHATROOMS;
+import static nukem.chatroom.service.impl.ChatRoomServiceImpl.getChatRoomTopic;
 
 @Service
 @RequiredArgsConstructor
@@ -33,7 +30,7 @@ public class MessageServiceImpl implements MessageService {
     private final AuthService authService;
     private final MessageRepository messageRepository;
     private final ChatRoomRepository chatRoomRepository;
-    private final SimpMessagingTemplate messagingTemplate;
+    private final WebsocketService websocketService;
 
     @Override
     @Transactional(readOnly = true)
@@ -58,8 +55,10 @@ public class MessageServiceImpl implements MessageService {
                 .date(LocalDateTime.now())
                 .build();
         final Message savedMessage = messageRepository.save(message);
-        messagingTemplate.convertAndSend(CHATROOMS + SLASH + chatRoomId, MessageDto.toDto(savedMessage),
-                Collections.singletonMap(Header.EVENT_TYPE.getValue(), EventType.CHAT_MESSAGE.getValue()));
+
+        websocketService.notifyWebsocketSubscribers(getChatRoomTopic(chatRoomId), MessageDto.toDto(savedMessage),
+                EventType.CHAT_MESSAGE);
+
         return savedMessage;
     }
 
@@ -68,8 +67,10 @@ public class MessageServiceImpl implements MessageService {
     public void deleteMessage(final Long id) {
         final Message message = messageRepository.findById(id).orElseThrow();
         verifyMessageOwnership(message);
-        messagingTemplate.convertAndSend(CHATROOMS + SLASH + message.getChatRoom().getId(), MessageDto.toDto(message),
-                Collections.singletonMap(Header.EVENT_TYPE.getValue(), EventType.CHAT_MESSAGE_DELETE.getValue()));
+
+        websocketService.notifyWebsocketSubscribers(getChatRoomTopic(message.getChatRoom().getId()),
+                MessageDto.toDto(message), EventType.CHAT_MESSAGE_DELETE);
+
         messageRepository.delete(message);
     }
 
@@ -79,8 +80,10 @@ public class MessageServiceImpl implements MessageService {
         final Message message = messageRepository.findById(id).orElseThrow();
         verifyMessageOwnership(message);
         message.setContent(sendMessageRequest.content());
-        messagingTemplate.convertAndSend(CHATROOMS + SLASH + message.getChatRoom().getId(), MessageDto.toDto(message),
-                Collections.singletonMap(Header.EVENT_TYPE.getValue(), EventType.CHAT_MESSAGE_EDIT.getValue()));
+
+        websocketService.notifyWebsocketSubscribers(getChatRoomTopic(message.getChatRoom().getId()),
+                MessageDto.toDto(message), EventType.CHAT_MESSAGE_EDIT);
+
         return messageRepository.save(message);
     }
 

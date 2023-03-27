@@ -1,6 +1,6 @@
 # Chatroom Backend
 
-This is the backend for a chatroom application built using Spring Boot, PostgreSQL, and Websockets. The backend provides API endpoints for creating and managing chatrooms, sending and receiving messages in real-time using Websockets, and storing chatroom data in a PostgreSQL database.
+This is the backend for a chatroom application built using Spring Boot, PostgreSQL, and Websockets. The backend provides API endpoints for creating and managing chatrooms, sending and receiving messages in real-time using Websockets, and storing chatroom data in a PostgreSQL database. It also supports streaming live video in chatrooms.
 
 
 ## Requirements
@@ -46,6 +46,6 @@ Example response from `/login` endpoint:
 
 The backend uses Websockets to send and receive messages in real-time and track active users in a chatroom.
 - Websocket connections require a JWT token to authenticate users.
-- When a user sends a message, it is broadcasted to all users in the chatroom using Websockets.
+- When a user sends a message or starts/stops a video stream, it is broadcasted to all users in the chatroom using Websockets.
 - Clients can subscribe to a specific chatroom and receive updates in real-time when new messages are sent.
 - Clients receive updates in real-time when users join/leave room.

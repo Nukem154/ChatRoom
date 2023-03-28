@@ -14,12 +14,13 @@ import nukem.chatroom.model.user.User;
 import nukem.chatroom.repository.ChatRoomRepository;
 import nukem.chatroom.service.AuthService;
 import nukem.chatroom.service.ChatRoomService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.messaging.simp.user.SimpUserRegistry;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.BiConsumer;
@@ -85,8 +86,8 @@ public class ChatRoomServiceImpl implements ChatRoomService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<ChatRoomShortDto> getChatRooms() {
-        return chatRoomRepository.findAll().stream().map(ChatRoomShortDto::toDto).collect(Collectors.toList());
+    public Page<ChatRoomShortDto> getChatRooms(final Pageable pageRequest) {
+        return chatRoomRepository.findAllByOrderByIdDesc(pageRequest).map(ChatRoomShortDto::toDto);
     }
 
     @Override

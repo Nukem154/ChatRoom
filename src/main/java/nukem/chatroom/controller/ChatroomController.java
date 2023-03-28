@@ -6,10 +6,10 @@ import nukem.chatroom.dto.chatroom.ChatRoomShortDto;
 import nukem.chatroom.dto.request.CreateRoomRequest;
 import nukem.chatroom.model.ChatRoom;
 import nukem.chatroom.service.ChatRoomService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/chatrooms")
@@ -19,8 +19,9 @@ public class ChatroomController {
     private final ChatRoomService chatRoomService;
 
     @GetMapping
-    public ResponseEntity<List<ChatRoomShortDto>> getChatRooms() {
-        return ResponseEntity.ok().body(chatRoomService.getChatRooms());
+    public ResponseEntity<Page<ChatRoomShortDto>> getChatRooms(@RequestParam(defaultValue = "0") Integer page,
+                                                               @RequestParam(defaultValue = "15") Integer size) {
+        return ResponseEntity.ok().body(chatRoomService.getChatRooms(PageRequest.of(page, size)));
     }
 
     @PostMapping

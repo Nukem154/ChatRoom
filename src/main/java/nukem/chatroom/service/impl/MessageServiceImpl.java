@@ -12,7 +12,7 @@ import nukem.chatroom.service.AuthService;
 import nukem.chatroom.service.MessageService;
 import nukem.chatroom.service.WebsocketService;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -34,13 +34,13 @@ public class MessageServiceImpl implements MessageService {
 
     @Override
     @Transactional(readOnly = true)
-    public Page<Message> getUserMessagesOrderByIdDesc(final PageRequest pageRequest) {
+    public Page<Message> getUserMessagesOrderByIdDesc(final Pageable pageRequest) {
         return messageRepository.findAllByUserIdOrderByIdDesc(authService.getCurrentUser().getId(), pageRequest);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public Page<MessageDto> getMessagesByChatRoomId(final Long chatRoomId, final PageRequest pageRequest) {
+    public Page<MessageDto> getMessagesByChatRoomId(final Long chatRoomId, final Pageable pageRequest) {
         return messageRepository.findAllByChatRoomIdOrderByIdDesc(chatRoomId, pageRequest).map(MessageDto::toDto);
     }
 

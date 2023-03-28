@@ -6,4 +6,5 @@ public class WebSocketURL {
     public static final String USERS = "/users";
     public static final String MESSAGES = "/messages";
     public static final String STREAMER = "/streamer";
+    public static final String APP = "/app";
 }

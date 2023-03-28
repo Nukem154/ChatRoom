@@ -6,13 +6,10 @@ import lombok.extern.slf4j.Slf4j;
 import nukem.chatroom.dto.request.LoginRequest;
 import nukem.chatroom.dto.request.RegisterRequest;
 import nukem.chatroom.dto.response.LoginResponse;
-import nukem.chatroom.service.TokenService;
+import nukem.chatroom.service.AuthService;
 import nukem.chatroom.service.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -24,16 +21,12 @@ import org.springframework.web.bind.annotation.RestController;
 @Slf4j
 public class AuthController {
 
-    private final TokenService tokenService;
-    private final AuthenticationManager authenticationManager;
     private final UserService userService;
+    private final AuthService authService;
 
     @PostMapping("/login")
-    public ResponseEntity<LoginResponse> login(@RequestBody LoginRequest userLogin) {
-        Authentication authentication =
-                authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(userLogin.username(), userLogin.password()));
-        log.debug("User {} authenticated", userLogin.username());
-        return ResponseEntity.ok(new LoginResponse(tokenService.generateToken(authentication)));
+    public ResponseEntity<LoginResponse> login(@RequestBody LoginRequest loginRequest) {
+        return ResponseEntity.ok(new LoginResponse(authService.authenticateUser(loginRequest)));
     }
 
     @PostMapping("/register")

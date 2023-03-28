@@ -25,8 +25,7 @@ import org.springframework.web.socket.config.annotation.WebSocketTransportRegist
 
 import java.util.List;
 
-import static nukem.chatroom.constants.WebSocketURL.CHATROOMS;
-import static nukem.chatroom.constants.WebSocketURL.STOMP;
+import static nukem.chatroom.constants.WebSocketURL.*;
 
 @Configuration
 @EnableWebSocketMessageBroker
@@ -41,7 +40,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
         config.enableSimpleBroker(CHATROOMS)
                 .setTaskScheduler(heartBeatScheduler())
                 .setHeartbeatValue(new long[]{10000, 10000});
-        config.setApplicationDestinationPrefixes("/app");
+        config.setApplicationDestinationPrefixes(APP);
     }
 
     @Override

@@ -35,12 +35,11 @@ public class UserServiceImpl implements UserService {
     public User createUser(final RegisterRequest request) {
         final String username = request.username();
         final String password = request.password();
-        if (StringUtils.isEmpty(username)) {
-            throw new IllegalArgumentException("Username " + CANNOT_BE_EMPTY);
+
+        if (StringUtils.isEmpty(username) || StringUtils.isEmpty(password)) {
+            throw new IllegalArgumentException("Username/Password " + CANNOT_BE_EMPTY);
         }
-        if (StringUtils.isEmpty(password)) {
-            throw new IllegalArgumentException("Password " + CANNOT_BE_EMPTY);
-        }
+
         userRepository.findByUsername(username).ifPresent((u) -> {
             throw new UserAlreadyExistsException(username);
         });

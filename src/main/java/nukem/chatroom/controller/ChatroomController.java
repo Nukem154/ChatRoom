@@ -19,9 +19,10 @@ public class ChatroomController {
     private final ChatRoomService chatRoomService;
 
     @GetMapping
-    public ResponseEntity<Page<ChatRoomShortDto>> getChatRooms(@RequestParam(defaultValue = "0") Integer page,
+    public ResponseEntity<Page<ChatRoomShortDto>> getChatRooms(@RequestParam(required = false) String name,
+                                                               @RequestParam(defaultValue = "0") Integer page,
                                                                @RequestParam(defaultValue = "15") Integer size) {
-        return ResponseEntity.ok().body(chatRoomService.getChatRooms(PageRequest.of(page, size)));
+        return ResponseEntity.ok().body(chatRoomService.findAllChatroomsByFilterParams(name, PageRequest.of(page, size)));
     }
 
     @PostMapping

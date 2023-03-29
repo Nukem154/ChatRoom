@@ -12,7 +12,7 @@ public interface ChatRoomService {
 
     ChatRoomDetailedDto getChatRoomInfo(Long id);
 
-    Page<ChatRoomShortDto> getChatRooms(Pageable pageRequest);
+    Page<ChatRoomShortDto> findAllChatroomsByFilterParams(String name, Pageable pageRequest);
 
     void joinChatRoom(Long chatRoomId);
 

@@ -86,7 +86,10 @@ public class ChatRoomServiceImpl implements ChatRoomService {
 
     @Override
     @Transactional(readOnly = true)
-    public Page<ChatRoomShortDto> getChatRooms(final Pageable pageRequest) {
+    public Page<ChatRoomShortDto> findAllChatroomsByFilterParams(final String name, final Pageable pageRequest) {
+        if(name != null) {
+            return chatRoomRepository.findAllByNameContainingOrderByIdDesc(name, pageRequest).map(ChatRoomShortDto::toDto);
+        }
         return chatRoomRepository.findAllByOrderByIdDesc(pageRequest).map(ChatRoomShortDto::toDto);
     }
 

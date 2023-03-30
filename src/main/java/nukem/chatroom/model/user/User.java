@@ -3,8 +3,7 @@ package nukem.chatroom.model.user;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 import nukem.chatroom.model.ChatRoom;
 import nukem.chatroom.model.Message;
 
@@ -17,6 +16,9 @@ import java.util.Set;
 @Table(name = "users")
 @Getter
 @Setter
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class User {
 
     @Id
@@ -38,21 +40,11 @@ public class User {
     @Enumerated(EnumType.STRING)
     private Set<Role> roles;
 
-    @JsonManagedReference
-    @ManyToMany(mappedBy = "users")
+    @OneToMany
     private Set<ChatRoom> chatRooms = new HashSet<>();
 
     @JsonManagedReference
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
     private List<Message> messages = new ArrayList<>();
-
-    public User() {
-    }
-
-    public User(String username, String password, Set<Role> roles) {
-        this.username = username;
-        this.password = password;
-        this.roles = roles;
-    }
 
 }

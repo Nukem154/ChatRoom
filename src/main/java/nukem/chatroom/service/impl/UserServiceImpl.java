@@ -19,12 +19,13 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Collections;
 
+import static nukem.chatroom.constants.Constants.*;
+
 @Service
 @RequiredArgsConstructor
 @Slf4j
 public class UserServiceImpl implements UserService {
 
-    public static final String CANNOT_BE_EMPTY = "cannot be empty";
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final AuthService authService;
@@ -37,13 +38,18 @@ public class UserServiceImpl implements UserService {
         final String password = request.password();
 
         if (StringUtils.isEmpty(username) || StringUtils.isEmpty(password)) {
-            throw new IllegalArgumentException("Username/Password " + CANNOT_BE_EMPTY);
+            throw new IllegalArgumentException(PASSWORD + SLASH + USERNAME + CANNOT_BE_EMPTY);
         }
 
         userRepository.findByUsername(username).ifPresent((u) -> {
             throw new UserAlreadyExistsException(username);
         });
-        final User user = new User(username, passwordEncoder.encode(password), Collections.singleton(Role.ROLE_USER));
+
+        final User user = User.builder()
+                .username(username)
+                .password(passwordEncoder.encode(password))
+                .roles(Collections.singleton(Role.ROLE_USER))
+                .build();
 
         return userRepository.save(user);
     }
@@ -52,10 +58,11 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public String updateAvatar(final MultipartFile file) {
         final User user = authService.getCurrentUser();
-        final Avatar avatar = new Avatar();
         final String avatarUrl = awsService.uploadToAWS(file);
-        avatar.setUrl(avatarUrl);
-        avatar.setUser(user);
+        final Avatar avatar = Avatar.builder()
+                .url(avatarUrl)
+                .user(user)
+                .build();
         user.setAvatar(avatar);
         userRepository.save(user);
         return avatarUrl;

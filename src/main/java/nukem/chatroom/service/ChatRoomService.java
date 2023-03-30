@@ -12,9 +12,6 @@ public interface ChatRoomService {
 
     ChatRoomDetailedDto getChatRoomInfo(Long id);
 
-    Page<ChatRoomShortDto> findAllChatroomsByFilterParams(String name, Pageable pageRequest);
+    Page<ChatRoomShortDto> findAllChatRoomsByFilterParams(String name, Pageable pageRequest);
 
-    void joinChatRoom(Long chatRoomId);
-
-    void leaveChatRoom(Long chatRoomId);
 }

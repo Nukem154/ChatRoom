@@ -1,5 +1,6 @@
 package nukem.chatroom.controller;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import nukem.chatroom.dto.chatroom.ChatRoomDetailedDto;
 import nukem.chatroom.dto.chatroom.ChatRoomShortDto;
@@ -22,11 +23,11 @@ public class ChatroomController {
     public ResponseEntity<Page<ChatRoomShortDto>> getChatRooms(@RequestParam(required = false) String name,
                                                                @RequestParam(defaultValue = "0") Integer page,
                                                                @RequestParam(defaultValue = "15") Integer size) {
-        return ResponseEntity.ok().body(chatRoomService.findAllChatroomsByFilterParams(name, PageRequest.of(page, size)));
+        return ResponseEntity.ok().body(chatRoomService.findAllChatRoomsByFilterParams(name, PageRequest.of(page, size)));
     }
 
     @PostMapping
-    public ResponseEntity<ChatRoom> createChatRoom(@RequestBody CreateRoomRequest request) {
+    public ResponseEntity<ChatRoom> createChatRoom(@RequestBody @Valid CreateRoomRequest request) {
         return ResponseEntity.ok().body(chatRoomService.createChatRoom(request));
     }
 
@@ -34,21 +35,4 @@ public class ChatroomController {
     public ResponseEntity<ChatRoomDetailedDto> getChatRoomDetailedInfo(@PathVariable Long id) {
         return ResponseEntity.ok().body(chatRoomService.getChatRoomInfo(id));
     }
-
-//    @GetMapping("/{id}/users")
-//    public ResponseEntity<Set<String>> getActiveUsers(@PathVariable Long id) {
-//        return ResponseEntity.ok().body(chatRoomService.getActiveUsersInRoom(id));
-//    }
-//
-//    @PostMapping("/{chatRoomId}/join")
-//    public ResponseEntity<HttpStatus> joinChatRoom(@PathVariable Long chatRoomId) {
-//        chatRoomService.joinChatRoom(chatRoomId);
-//        return ResponseEntity.noContent().build();
-//    }
-//
-//    @PostMapping("/{chatRoomId}/leave")
-//    public ResponseEntity<HttpStatus> leaveChatRoom(@PathVariable Long chatRoomId) {
-//        chatRoomService.leaveChatRoom(chatRoomId);
-//        return ResponseEntity.noContent().build();
-//    }
 }

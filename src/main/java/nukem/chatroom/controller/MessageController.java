@@ -24,9 +24,9 @@ public class MessageController {
     }
 
     @GetMapping("/chatrooms/{chatRoomId}/messages")
-    public ResponseEntity<Page<MessageDto>> getMessages(@PathVariable Long chatRoomId,
-                                                        @RequestParam(defaultValue = "0") Integer page,
-                                                        @RequestParam(defaultValue = "15") Integer size) {
+    public ResponseEntity<Page<MessageDto>> getMessagesInRoom(@PathVariable Long chatRoomId,
+                                                              @RequestParam(defaultValue = "0") Integer page,
+                                                              @RequestParam(defaultValue = "15") Integer size) {
         return ResponseEntity.ok(messageService.getMessagesByChatRoomId(chatRoomId, PageRequest.of(page, size)));
     }
 

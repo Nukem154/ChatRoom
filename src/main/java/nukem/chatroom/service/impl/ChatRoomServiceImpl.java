@@ -51,13 +51,13 @@ public class ChatRoomServiceImpl implements ChatRoomService {
     public ChatRoomDetailedDto getChatRoomInfo(final Long id) {
         return chatRoomRepository.findById(id).map(chatRoom -> {
             var chatRoomDetailedDto = ChatRoomDetailedDto.toDto(chatRoom);
-            chatRoomDetailedDto.setUsers(getActiveUsersDto(id, chatRoom));
+            chatRoomDetailedDto.setActiveUsers(getActiveUsersDto(chatRoom));
             return chatRoomDetailedDto;
         }).orElseThrow(EntityNotFoundException::new);
     }
 
-    private Set<UserDto> getActiveUsersDto(final Long id, final ChatRoom chatRoom) {
-        final Set<UserDto> usersDto = getActiveUsersInRoom(id).stream()
+    private Set<UserDto> getActiveUsersDto(final ChatRoom chatRoom) {
+        final Set<UserDto> usersDto = getActiveUsersInRoom(chatRoom.getId()).stream()
                 .map(username -> UserDto.builder().username(username).build())
                 .collect(Collectors.toSet());
 
@@ -73,7 +73,7 @@ public class ChatRoomServiceImpl implements ChatRoomService {
         return usersDto;
     }
 
-    private Set<String> getActiveUsersInRoom(final Long roomId) {
+    protected Set<String> getActiveUsersInRoom(final Long roomId) {
         return userRegistry.findSubscriptions(subscription -> subscription.getDestination().equals(CHATROOMS + SLASH + roomId))
                 .stream()
                 .map(subscription -> subscription.getSession().getUser().getName())

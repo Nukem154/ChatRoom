@@ -37,31 +37,30 @@ class AuthServiceImplTest {
 
     @Test
     void getCurrentUserTest() {
-        User user = User.builder()
+        final User user = User.builder()
                 .username(username)
                 .password(password)
                 .build();
-
-        Authentication authentication = new UsernamePasswordAuthenticationToken(username, password);
+        final Authentication authentication = new UsernamePasswordAuthenticationToken(username, password);
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
         when(userRepository.findByUsername(username)).thenReturn(Optional.of(user));
 
-        User currentUser = authService.getCurrentUser();
+        final User currentUser = authService.getCurrentUser();
 
         assertEquals(user, currentUser);
     }
 
     @Test
     void authenticateUserTest() {
-        String expectedToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0VXNlciIsImlhdCI6MTYxNjIwMzY2MCwiZXhwIjoxNjE2MjA3MjYwfQ.HARW6K8XdvTcG6z-RcVq3ncj8cbv7scO6OJU6FYsU_E";
-        Authentication authentication = new UsernamePasswordAuthenticationToken(username, password);
-        LoginRequest loginRequest = new LoginRequest(username, password);
+        final String expectedToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0VXNlciIsImlhdCI6MTYxNjIwMzY2MCwiZXhwIjoxNjE2MjA3MjYwfQ.HARW6K8XdvTcG6z-RcVq3ncj8cbv7scO6OJU6FYsU_E";
+        final Authentication authentication = new UsernamePasswordAuthenticationToken(username, password);
+        final LoginRequest loginRequest = new LoginRequest(username, password);
 
         when(authenticationManager.authenticate(any())).thenReturn(authentication);
         when(tokenService.generateToken(authentication)).thenReturn(expectedToken);
 
-        String token = authService.authenticateUser(loginRequest);
+        final String token = authService.authenticateUser(loginRequest);
 
         assertEquals(expectedToken, token);
     }

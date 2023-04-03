@@ -55,11 +55,11 @@ class ChatRoomServiceImplTest {
         when(authService.getCurrentUser()).thenReturn(currentUser);
         when(chatRoomRepository.save(any(ChatRoom.class))).thenReturn(chatRoom);
 
-        final ChatRoom result = chatRoomService.createChatRoom(request);
+        final ChatRoomDetailedDto result = chatRoomService.createChatRoom(request);
 
         assertEquals(request.name(), result.getName());
         assertEquals(request.description(), result.getDescription());
-        assertEquals(currentUser, result.getOwner());
+        assertEquals(currentUser.getUsername(), result.getOwner());
     }
 
     @Test
@@ -72,7 +72,7 @@ class ChatRoomServiceImplTest {
                 .id(roomId)
                 .name("Test Room")
                 .description("This is a test room")
-                .streams(new HashSet<>())
+                .videoStreams(new HashSet<>())
                 .owner(owner)
                 .build();
         final Set<String> activeUsers = Set.of("user1", "user2");

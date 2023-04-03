@@ -1,16 +1,18 @@
 package nukem.chatroom.service.impl;
 
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import nukem.chatroom.dto.MessageDto;
 import nukem.chatroom.dto.request.SendMessageRequest;
 import nukem.chatroom.enums.headers.EventType;
 import nukem.chatroom.model.ChatRoom;
 import nukem.chatroom.model.Message;
-import nukem.chatroom.repository.ChatRoomRepository;
 import nukem.chatroom.repository.MessageRepository;
 import nukem.chatroom.service.AuthService;
+import nukem.chatroom.service.ChatRoomService;
 import nukem.chatroom.service.MessageService;
 import nukem.chatroom.service.WebsocketService;
+import nukem.chatroom.utils.ErrorMessageUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.AccessDeniedException;
@@ -19,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 
+import static nukem.chatroom.constants.Constants.MESSAGE;
 import static nukem.chatroom.service.impl.ChatRoomServiceImpl.getChatRoomTopic;
 
 @Service
@@ -29,8 +32,15 @@ public class MessageServiceImpl implements MessageService {
 
     private final AuthService authService;
     private final MessageRepository messageRepository;
-    private final ChatRoomRepository chatRoomRepository;
+    private final ChatRoomService chatRoomService;
     private final WebsocketService websocketService;
+
+    @Override
+    @Transactional(readOnly = true)
+    public Message getMessageById(final Long id) {
+        return messageRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException(ErrorMessageUtils.entityNotFound(MESSAGE, id)));
+    }
 
     @Override
     @Transactional(readOnly = true)
@@ -47,7 +57,7 @@ public class MessageServiceImpl implements MessageService {
     @Override
     @Transactional
     public Message sendMessage(final Long chatRoomId, final SendMessageRequest sendMessageRequest) {
-        final ChatRoom chatRoom = chatRoomRepository.findById(chatRoomId).orElseThrow();
+        final ChatRoom chatRoom = chatRoomService.getChatRoomById(chatRoomId);
         final Message message = Message.builder()
                 .chatRoom(chatRoom)
                 .content(sendMessageRequest.content())
@@ -65,7 +75,8 @@ public class MessageServiceImpl implements MessageService {
     @Override
     @Transactional
     public void deleteMessage(final Long id) {
-        final Message message = messageRepository.findById(id).orElseThrow();
+        final Message message = getMessageById(id);
+
         verifyMessageOwnership(message);
 
         websocketService.notifyWebsocketSubscribers(getChatRoomTopic(message.getChatRoom().getId()),
@@ -77,8 +88,10 @@ public class MessageServiceImpl implements MessageService {
     @Override
     @Transactional
     public Message editMessage(final Long id, final SendMessageRequest sendMessageRequest) {
-        final Message message = messageRepository.findById(id).orElseThrow();
+        final Message message = getMessageById(id);
+
         verifyMessageOwnership(message);
+
         message.setContent(sendMessageRequest.content());
 
         websocketService.notifyWebsocketSubscribers(getChatRoomTopic(message.getChatRoom().getId()),

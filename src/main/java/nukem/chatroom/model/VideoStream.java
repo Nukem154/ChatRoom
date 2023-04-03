@@ -1,14 +1,18 @@
 package nukem.chatroom.model;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 import nukem.chatroom.model.user.User;
+
+import java.util.Set;
 
 @Entity
 @Getter
 @Setter
-public class Stream {
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+public class VideoStream {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
@@ -19,4 +23,7 @@ public class Stream {
 
     @OneToOne
     private User user;
+
+    @OneToMany
+    private Set<User> viewers;
 }

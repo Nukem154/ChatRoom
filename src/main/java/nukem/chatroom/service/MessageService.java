@@ -7,6 +7,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 public interface MessageService {
+
+    Message getMessageById(Long id);
+
     Page<Message> getUserMessagesOrderByIdDesc(Pageable pageRequest);
 
     Message sendMessage(Long chatRoomId, SendMessageRequest message);

@@ -8,7 +8,10 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 public interface ChatRoomService {
-    ChatRoom createChatRoom(CreateRoomRequest request);
+
+    ChatRoom getChatRoomById(Long chatRoomId);
+
+    ChatRoomDetailedDto createChatRoom(CreateRoomRequest request);
 
     ChatRoomDetailedDto getChatRoomInfo(Long id);
 

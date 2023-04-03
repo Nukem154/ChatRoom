@@ -21,19 +21,19 @@ public class TokenServiceImpl implements TokenService {
 
     private final JwtEncoder encoder;
 
-    public String generateToken(Authentication authentication) {
-        Instant now = Instant.now();
-        String scope = authentication.getAuthorities().stream()
+    public String generateToken(final Authentication authentication) {
+        final Instant now = Instant.now();
+        final String scope = authentication.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
                 .collect(Collectors.joining(" "));
-        JwtClaimsSet claims = JwtClaimsSet.builder()
+        final JwtClaimsSet claims = JwtClaimsSet.builder()
                 .issuer("self")
                 .issuedAt(now)
                 .expiresAt(now.plus(12, ChronoUnit.HOURS))
                 .subject(authentication.getName())
                 .claim("scope", scope)
                 .build();
-        var encoderParameters = JwtEncoderParameters.from(JwsHeader.with(MacAlgorithm.HS512).build(), claims);
-        return this.encoder.encode(encoderParameters).getTokenValue();
+        final JwtEncoderParameters encoderParameters = JwtEncoderParameters.from(JwsHeader.with(MacAlgorithm.HS512).build(), claims);
+        return encoder.encode(encoderParameters).getTokenValue();
     }
 }

@@ -7,7 +7,9 @@ public enum EventType {
     SUBSCRIBE_EVENT("subscribe-event"),
     UNSUBSCRIBE_EVENT("unsubscribe-event"),
     STREAM_STARTED_EVENT("stream-started-event"),
-    STREAM_ENDED_EVENT("stream-ended-event");
+    STREAM_ENDED_EVENT("stream-ended-event"),
+    STREAM_VIEWER_JOINED("stream-viewer-joined"),
+    STREAM_VIEWER_LEFT("stream-viewer-left");
 
     private final String value;
 

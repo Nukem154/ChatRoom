@@ -24,7 +24,7 @@ public class ChatRoom {
     private String description;
 
     @OneToMany(mappedBy = "chatRoom", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    private Set<Stream> streams = new HashSet<>();
+    private Set<VideoStream> videoStreams = new HashSet<>();
 
     @ManyToOne
     private User owner;

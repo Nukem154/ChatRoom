@@ -3,7 +3,7 @@ package nukem.chatroom.config.socket;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import nukem.chatroom.enums.headers.EventType;
-import nukem.chatroom.service.StreamService;
+import nukem.chatroom.service.VideoStreamService;
 import nukem.chatroom.service.WebsocketService;
 import org.springframework.context.event.EventListener;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
@@ -20,11 +20,11 @@ import static nukem.chatroom.constants.WebSocketURL.STREAMER;
 public class WebsocketEventListener {
 
     private final SubscriptionTracker subscriptionTracker;
-    private final StreamService streamService;
+    private final VideoStreamService videoStreamService;
     private final WebsocketService websocketService;
 
     @EventListener
-    public void handleSessionSubscribeEvent(SessionSubscribeEvent event) {
+    public void handleSessionSubscribeEvent(final SessionSubscribeEvent event) {
         final String destination = SimpMessageHeaderAccessor.wrap(event.getMessage()).getDestination();
 
         if (destination != null) {
@@ -62,7 +62,7 @@ public class WebsocketEventListener {
 
     private void endStreamIfNeeded(String username) {
         if (subscriptionTracker.isSubscriber(STREAMER, username)) {
-            streamService.endStream(username);
+            videoStreamService.endStreamByStreamerUsername(username);
         }
     }
 

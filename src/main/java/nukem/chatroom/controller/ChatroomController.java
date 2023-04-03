@@ -5,7 +5,6 @@ import lombok.RequiredArgsConstructor;
 import nukem.chatroom.dto.chatroom.ChatRoomDetailedDto;
 import nukem.chatroom.dto.chatroom.ChatRoomShortDto;
 import nukem.chatroom.dto.request.CreateRoomRequest;
-import nukem.chatroom.model.ChatRoom;
 import nukem.chatroom.service.ChatRoomService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -27,7 +26,7 @@ public class ChatroomController {
     }
 
     @PostMapping
-    public ResponseEntity<ChatRoom> createChatRoom(@RequestBody @Valid CreateRoomRequest request) {
+    public ResponseEntity<ChatRoomDetailedDto> createChatRoom(@RequestBody @Valid CreateRoomRequest request) {
         return ResponseEntity.ok().body(chatRoomService.createChatRoom(request));
     }
 

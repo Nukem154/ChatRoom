@@ -13,6 +13,7 @@ import java.util.Set;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class VideoStream {
 
     @Id
@@ -23,6 +24,7 @@ public class VideoStream {
     private ChatRoom chatRoom;
 
     @OneToOne
+    @EqualsAndHashCode.Include
     private User user;
 
     @OneToMany

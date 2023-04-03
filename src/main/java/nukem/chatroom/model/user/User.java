@@ -4,11 +4,9 @@ import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.*;
-import nukem.chatroom.model.ChatRoom;
 import nukem.chatroom.model.Message;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -19,6 +17,7 @@ import java.util.Set;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class User {
 
     @Id
@@ -26,6 +25,7 @@ public class User {
     private Long id;
 
     @Column(unique = true)
+    @EqualsAndHashCode.Include
     private String username;
 
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
@@ -39,9 +39,6 @@ public class User {
     @CollectionTable(name = "user_role", joinColumns = @JoinColumn(name = "user_id"))
     @Enumerated(EnumType.STRING)
     private Set<Role> roles;
-
-    @OneToMany
-    private Set<ChatRoom> chatRooms = new HashSet<>();
 
     @JsonManagedReference
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)

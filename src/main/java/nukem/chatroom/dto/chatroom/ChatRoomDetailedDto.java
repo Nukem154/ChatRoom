@@ -7,7 +7,7 @@ import lombok.Setter;
 import nukem.chatroom.dto.UserDto;
 import nukem.chatroom.model.ChatRoom;
 
-import java.util.Set;
+import java.util.List;
 
 @Getter
 @Setter
@@ -18,7 +18,7 @@ public class ChatRoomDetailedDto {
     private String name;
     private String description;
     private String owner;
-    private Set<UserDto> activeUsers;
+    private List<UserDto> activeUsers;
 
     public static ChatRoomDetailedDto toDto(final ChatRoom chatRoom) {
         return ChatRoomDetailedDto.builder()

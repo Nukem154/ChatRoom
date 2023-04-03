@@ -18,6 +18,7 @@ import org.springframework.messaging.simp.user.SimpUserRegistry;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
@@ -63,10 +64,10 @@ public class ChatRoomServiceImpl implements ChatRoomService {
         return chatRoomDetailedDto;
     }
 
-    private Set<UserDto> getActiveUsersDto(final ChatRoom chatRoom) {
-        final Set<UserDto> usersDto = getActiveUsersInRoom(chatRoom.getId()).stream()
+    private List<UserDto> getActiveUsersDto(final ChatRoom chatRoom) {
+        final List<UserDto> usersDto = getActiveUsersInRoom(chatRoom.getId()).stream()
                 .map(username -> UserDto.builder().username(username).build())
-                .collect(Collectors.toSet());
+                .collect(Collectors.toList());
 
         final Map<String, UserDto> userDtoMap = usersDto.stream()
                 .collect(Collectors.toMap(UserDto::getUsername, Function.identity()));

@@ -1,4 +1,4 @@
-package nukem.chatroom.dto;
+package nukem.chatroom.dto.videostream;
 
 public record StreamViewershipDto(String viewerUsername, String streamerName) {
 }

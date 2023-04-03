@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import nukem.chatroom.model.user.User;
 
+import java.util.HashSet;
 import java.util.Set;
 
 @Entity
@@ -25,5 +26,6 @@ public class VideoStream {
     private User user;
 
     @OneToMany
-    private Set<User> viewers;
+    @Builder.Default
+    private Set<User> viewers = new HashSet<>();
 }

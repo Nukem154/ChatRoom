@@ -1,4 +1,4 @@
-package nukem.chatroom.dto;
+package nukem.chatroom.dto.videostream;
 
 import lombok.Builder;
 import lombok.Getter;

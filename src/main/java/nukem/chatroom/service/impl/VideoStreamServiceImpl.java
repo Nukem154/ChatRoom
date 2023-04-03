@@ -1,10 +1,10 @@
 package nukem.chatroom.service.impl;
 
-import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
-import nukem.chatroom.dto.StreamViewershipDto;
-import nukem.chatroom.dto.VideoStreamDto;
+import nukem.chatroom.dto.videostream.StreamViewershipDto;
+import nukem.chatroom.dto.videostream.VideoStreamDto;
 import nukem.chatroom.enums.headers.EventType;
+import nukem.chatroom.exception.VideoStreamNotFoundException;
 import nukem.chatroom.model.VideoStream;
 import nukem.chatroom.model.user.User;
 import nukem.chatroom.repository.StreamRepository;
@@ -12,11 +12,9 @@ import nukem.chatroom.service.AuthService;
 import nukem.chatroom.service.ChatRoomService;
 import nukem.chatroom.service.VideoStreamService;
 import nukem.chatroom.service.WebsocketService;
-import nukem.chatroom.utils.ErrorMessageUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import static nukem.chatroom.constants.Constants.VIDEO_STREAM;
 import static nukem.chatroom.service.impl.ChatRoomServiceImpl.getChatRoomTopic;
 
 @Service
@@ -30,9 +28,9 @@ public class VideoStreamServiceImpl implements VideoStreamService {
 
     @Override
     @Transactional(readOnly = true)
-    public VideoStream getStreamById(final Long id) {
-        return streamRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException(ErrorMessageUtils.entityNotFound(VIDEO_STREAM, id)));
+    public VideoStream getStreamByStreamerUsername(final String username) {
+        return streamRepository.findByUserUsername(username)
+                .orElseThrow(() -> new VideoStreamNotFoundException(username));
     }
 
     @Override
@@ -63,8 +61,8 @@ public class VideoStreamServiceImpl implements VideoStreamService {
 
     @Override
     @Transactional
-    public VideoStreamDto watchStream(final Long id) {
-        final VideoStream videoStream = getStreamById(id);
+    public VideoStreamDto watchStream(final String streamerUsername) {
+        final VideoStream videoStream = getStreamByStreamerUsername(streamerUsername);
         final User user = authService.getCurrentUser();
 
         videoStream.getViewers().add(user);
@@ -77,8 +75,8 @@ public class VideoStreamServiceImpl implements VideoStreamService {
 
     @Override
     @Transactional
-    public void stopWatchingStream(final Long id) {
-        final VideoStream videoStream = getStreamById(id);
+    public void stopWatchingStream(final String streamerUsername) {
+        final VideoStream videoStream = getStreamByStreamerUsername(streamerUsername);
         final User user = authService.getCurrentUser();
 
         videoStream.getViewers().remove(user);

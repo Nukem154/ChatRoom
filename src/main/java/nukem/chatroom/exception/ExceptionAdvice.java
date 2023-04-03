@@ -62,4 +62,10 @@ public class ExceptionAdvice {
         return ex.getMessage();
     }
 
+    @ExceptionHandler(VideoStreamNotFoundException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public String handleVideoStreamNotFoundException(VideoStreamNotFoundException ex) {
+        return ex.getMessage();
+    }
+
 }

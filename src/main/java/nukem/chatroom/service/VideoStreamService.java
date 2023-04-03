@@ -1,17 +1,17 @@
 package nukem.chatroom.service;
 
-import nukem.chatroom.dto.VideoStreamDto;
+import nukem.chatroom.dto.videostream.VideoStreamDto;
 import nukem.chatroom.model.VideoStream;
 
 public interface VideoStreamService {
 
-    VideoStream getStreamById(Long id);
+    VideoStream getStreamByStreamerUsername(String username);
 
     VideoStreamDto startStream(Long chatRoomId);
 
     void endStreamByStreamerUsername(String username);
 
-    VideoStreamDto watchStream(Long id);
+    VideoStreamDto watchStream(String streamerUsername);
 
-    void stopWatchingStream(Long id);
+    void stopWatchingStream(String streamerUsername);
 }

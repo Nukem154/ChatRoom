@@ -1,7 +1,7 @@
 package nukem.chatroom.controller;
 
 import lombok.RequiredArgsConstructor;
-import nukem.chatroom.dto.VideoStreamDto;
+import nukem.chatroom.dto.videostream.VideoStreamDto;
 import nukem.chatroom.service.AuthService;
 import nukem.chatroom.service.VideoStreamService;
 import org.springframework.http.HttpStatus;
@@ -29,14 +29,14 @@ public class VideoStreamController {
         return ResponseEntity.noContent().build();
     }
 
-    @PostMapping("/stream/{streamId}/watch")
-    public ResponseEntity<VideoStreamDto> watchStream(@PathVariable Long streamId) {
-        return ResponseEntity.ok(videoStreamService.watchStream(streamId));
+    @PostMapping("/stream/{streamerUsername}/watch")
+    public ResponseEntity<VideoStreamDto> watchStream(@PathVariable String streamerUsername) {
+        return ResponseEntity.ok(videoStreamService.watchStream(streamerUsername));
     }
 
-    @DeleteMapping("/stream/{streamId}/watch")
-    public ResponseEntity<HttpStatus> stopWatchingStream(@PathVariable Long streamId) {
-        videoStreamService.stopWatchingStream(streamId);
+    @DeleteMapping("/stream/{streamerUsername}/watch")
+    public ResponseEntity<HttpStatus> stopWatchingStream(@PathVariable String streamerUsername) {
+        videoStreamService.stopWatchingStream(streamerUsername);
         return ResponseEntity.noContent().build();
     }
 }

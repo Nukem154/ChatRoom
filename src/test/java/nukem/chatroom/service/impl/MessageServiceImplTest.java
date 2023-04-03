@@ -8,6 +8,7 @@ import nukem.chatroom.model.user.User;
 import nukem.chatroom.repository.ChatRoomRepository;
 import nukem.chatroom.repository.MessageRepository;
 import nukem.chatroom.service.AuthService;
+import nukem.chatroom.service.ChatRoomService;
 import nukem.chatroom.service.WebsocketService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -38,7 +39,7 @@ class MessageServiceImplTest {
     @Mock
     private MessageRepository messageRepository;
     @Mock
-    private ChatRoomRepository chatRoomRepository;
+    private ChatRoomService chatRoomService;
     @Mock
     private WebsocketService websocketService;
     @InjectMocks
@@ -66,13 +67,13 @@ class MessageServiceImplTest {
                 .date(LocalDateTime.now())
                 .build();
 
-        when(chatRoomRepository.findById(chatRoomId)).thenReturn(Optional.of(chatRoom));
+        when(chatRoomService.getChatRoomById(chatRoomId)).thenReturn(chatRoom);
         when(authService.getCurrentUser()).thenReturn(user);
         when(messageRepository.save(any())).thenReturn(savedMessage);
 
         final Message result = messageService.sendMessage(chatRoomId, sendMessageRequest);
 
-        verify(chatRoomRepository).findById(chatRoomId);
+        verify(chatRoomService).getChatRoomById(chatRoomId);
         verify(authService).getCurrentUser();
         verify(messageRepository).save(any());
         verify(websocketService).notifyWebsocketSubscribers(eq(getChatRoomTopic(chatRoomId)), any(), eq(EventType.CHAT_MESSAGE));

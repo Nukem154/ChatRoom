@@ -1,10 +1,11 @@
-package nukem.chatroom.dto;
+package nukem.chatroom.dto.chatroom;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
+import nukem.chatroom.dto.videostream.VideoStreamDto;
 import nukem.chatroom.model.user.User;
 
 @Getter
@@ -12,13 +13,15 @@ import nukem.chatroom.model.user.User;
 @Builder
 @EqualsAndHashCode
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class UserDto {
+public class ChatRoomMemberDto {
+
     private Long id;
     private String username;
     private String avatarUrl;
+    private VideoStreamDto stream;
 
-    public static UserDto toDto(User user) {
-        return UserDto.builder()
+    public static ChatRoomMemberDto toDto(User user) {
+        return ChatRoomMemberDto.builder()
                 .id(user.getId())
                 .username(user.getUsername())
 //                .avatarUrl(user.getAvatar() != null ? user.getAvatar().getUrl() : null)

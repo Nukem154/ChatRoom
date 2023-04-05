@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import nukem.chatroom.dto.request.RegisterRequest;
 import nukem.chatroom.exception.UserAlreadyExistsException;
+import nukem.chatroom.exception.UserNotFoundException;
 import nukem.chatroom.model.user.Avatar;
 import nukem.chatroom.model.user.Role;
 import nukem.chatroom.model.user.User;
@@ -66,5 +67,11 @@ public class UserServiceImpl implements UserService {
         user.setAvatar(avatar);
         userRepository.save(user);
         return avatarUrl;
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public User getUserByUsername(final String username) {
+        return userRepository.findByUsername(username).orElseThrow(() -> new UserNotFoundException(username));
     }
 }

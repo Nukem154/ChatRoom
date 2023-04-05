@@ -3,14 +3,16 @@ package nukem.chatroom.service.impl;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import nukem.chatroom.dto.UserDto;
 import nukem.chatroom.dto.chatroom.ChatRoomDetailedDto;
+import nukem.chatroom.dto.chatroom.ChatRoomMemberDto;
 import nukem.chatroom.dto.chatroom.ChatRoomShortDto;
 import nukem.chatroom.dto.request.CreateRoomRequest;
+import nukem.chatroom.dto.videostream.VideoStreamDto;
 import nukem.chatroom.model.ChatRoom;
 import nukem.chatroom.repository.ChatRoomRepository;
 import nukem.chatroom.service.AuthService;
 import nukem.chatroom.service.ChatRoomService;
+import nukem.chatroom.service.UserService;
 import nukem.chatroom.utils.ErrorMessageUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -36,6 +38,7 @@ public class ChatRoomServiceImpl implements ChatRoomService {
     private final ChatRoomRepository chatRoomRepository;
     private final AuthService authService;
     private final SimpUserRegistry userRegistry;
+    private final UserService userService;
 
     @Override
     @Transactional(readOnly = true)
@@ -64,21 +67,21 @@ public class ChatRoomServiceImpl implements ChatRoomService {
         return chatRoomDetailedDto;
     }
 
-    private List<UserDto> getActiveUsersDto(final ChatRoom chatRoom) {
-        final List<UserDto> usersDto = getActiveUsersInRoom(chatRoom.getId()).stream()
-                .map(username -> UserDto.builder().username(username).build())
+    private List<ChatRoomMemberDto> getActiveUsersDto(final ChatRoom chatRoom) {
+        final List<ChatRoomMemberDto> activeUsers = getActiveUsersInRoom(chatRoom.getId()).stream()
+                .map(username -> ChatRoomMemberDto.toDto(userService.getUserByUsername(username)))
                 .collect(Collectors.toList());
 
-        final Map<String, UserDto> userDtoMap = usersDto.stream()
-                .collect(Collectors.toMap(UserDto::getUsername, Function.identity()));
+        final Map<String, ChatRoomMemberDto> userDtoMap = activeUsers.stream()
+                .collect(Collectors.toMap(ChatRoomMemberDto::getUsername, Function.identity()));
 
         chatRoom.getVideoStreams().forEach(stream -> {
-            UserDto userDto = userDtoMap.get(stream.getUser().getUsername());
+            ChatRoomMemberDto userDto = userDtoMap.get(stream.getUser().getUsername());
             if (userDto != null) {
-                userDto.setUserStreaming(true);
+                userDto.setStream(VideoStreamDto.toDto(stream));
             }
         });
-        return usersDto;
+        return activeUsers;
     }
 
     protected Set<String> getActiveUsersInRoom(final Long roomId) {

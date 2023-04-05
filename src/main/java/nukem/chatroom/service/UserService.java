@@ -26,4 +26,6 @@ public interface UserService {
      * @return the URL of the updated avatar image
      */
     String updateAvatar(MultipartFile file);
+
+    User getUserByUsername(String username);
 }

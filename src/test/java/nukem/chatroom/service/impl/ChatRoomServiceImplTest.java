@@ -1,13 +1,14 @@
 package nukem.chatroom.service.impl;
 
-import nukem.chatroom.dto.UserDto;
 import nukem.chatroom.dto.chatroom.ChatRoomDetailedDto;
+import nukem.chatroom.dto.chatroom.ChatRoomMemberDto;
 import nukem.chatroom.dto.chatroom.ChatRoomShortDto;
 import nukem.chatroom.dto.request.CreateRoomRequest;
 import nukem.chatroom.model.ChatRoom;
 import nukem.chatroom.model.user.User;
 import nukem.chatroom.repository.ChatRoomRepository;
 import nukem.chatroom.service.AuthService;
+import nukem.chatroom.service.UserService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -36,6 +37,8 @@ class ChatRoomServiceImplTest {
     private ChatRoomRepository chatRoomRepository;
     @Mock
     private AuthService authService;
+    @Mock
+    private UserService userService;
     @InjectMocks
     @Spy
     private ChatRoomServiceImpl chatRoomService;
@@ -79,6 +82,9 @@ class ChatRoomServiceImplTest {
 
         when(chatRoomRepository.findById(roomId)).thenReturn(Optional.of(chatRoom));
         doReturn(activeUsers).when(chatRoomService).getActiveUsersInRoom(roomId);
+        for (String username : activeUsers) {
+            when(userService.getUserByUsername(username)).thenReturn(User.builder().username(username).build());
+        }
 
         final ChatRoomDetailedDto result = chatRoomService.getChatRoomInfo(roomId);
 
@@ -87,7 +93,7 @@ class ChatRoomServiceImplTest {
         assertEquals(chatRoom.getDescription(), result.getDescription());
         assertEquals(owner.getUsername(), result.getOwner());
         assertEquals(activeUsers.size(), result.getActiveUsers().size());
-        assertTrue(result.getActiveUsers().stream().map(UserDto::getUsername).allMatch(activeUsers::contains));
+        assertTrue(result.getActiveUsers().stream().map(ChatRoomMemberDto::getUsername).allMatch(activeUsers::contains));
     }
 
     @Test

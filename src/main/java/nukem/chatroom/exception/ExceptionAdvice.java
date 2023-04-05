@@ -68,4 +68,10 @@ public class ExceptionAdvice {
         return ex.getMessage();
     }
 
+    @ExceptionHandler(VideoStreamAlreadyInLiveStateException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public String handleVideoStreamAlreadyInLiveStateException(VideoStreamAlreadyInLiveStateException ex) {
+        return ex.getMessage();
+    }
+
 }

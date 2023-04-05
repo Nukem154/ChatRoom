@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import nukem.chatroom.dto.videostream.StreamViewershipDto;
 import nukem.chatroom.dto.videostream.VideoStreamDto;
 import nukem.chatroom.enums.headers.EventType;
+import nukem.chatroom.exception.VideoStreamAlreadyInLiveStateException;
 import nukem.chatroom.exception.VideoStreamNotFoundException;
 import nukem.chatroom.model.VideoStream;
 import nukem.chatroom.model.user.User;
@@ -36,13 +37,20 @@ public class VideoStreamServiceImpl implements VideoStreamService {
     @Override
     @Transactional
     public VideoStreamDto startStream(final Long chatRoomId) {
+        final User currentUser = authService.getCurrentUser();
+
+        streamRepository.findByUserUsername(currentUser.getUsername()).ifPresent((stream) -> {
+                    throw new VideoStreamAlreadyInLiveStateException();
+                }
+        );
+
         final VideoStream videoStream = VideoStream.builder()
                 .chatRoom(chatRoomService.getChatRoomById(chatRoomId))
-                .user(authService.getCurrentUser())
+                .user(currentUser)
                 .build();
 
         websocketService.notifyWebsocketSubscribers(getChatRoomTopic(videoStream.getChatRoom().getId()),
-                videoStream.getUser().getUsername(), EventType.STREAM_STARTED_EVENT);
+                currentUser.getUsername(), EventType.STREAM_STARTED_EVENT);
 
         return VideoStreamDto.toDto(streamRepository.save(videoStream));
     }

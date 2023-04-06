@@ -2,7 +2,9 @@ package nukem.chatroom.config.socket;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import nukem.chatroom.dto.chatroom.ChatRoomMemberDto;
 import nukem.chatroom.enums.headers.EventType;
+import nukem.chatroom.service.UserService;
 import nukem.chatroom.service.VideoStreamService;
 import nukem.chatroom.service.WebsocketService;
 import org.springframework.context.event.EventListener;
@@ -22,6 +24,7 @@ public class WebsocketEventListener {
     private final SubscriptionTracker subscriptionTracker;
     private final VideoStreamService videoStreamService;
     private final WebsocketService websocketService;
+    private final UserService userService;
 
     @EventListener
     public void handleSessionSubscribeEvent(final SessionSubscribeEvent event) {
@@ -31,7 +34,8 @@ public class WebsocketEventListener {
             final String username = event.getUser().getName();
 
             if (isChatroomDestination(destination)) {
-                websocketService.notifyWebsocketSubscribers(destination, username, EventType.SUBSCRIBE_EVENT);
+                websocketService.notifyWebsocketSubscribers(destination,
+                        ChatRoomMemberDto.toDto(userService.getUserByUsername(username)), EventType.SUBSCRIBE_EVENT);
                 log.debug("User {} subscribed to destination: {}", username, destination);
             } else if (isStreamerDestination(destination)) {
                 subscriptionTracker.addSubscriber(STREAMER, username);

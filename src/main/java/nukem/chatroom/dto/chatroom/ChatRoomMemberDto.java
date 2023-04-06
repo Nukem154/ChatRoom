@@ -1,6 +1,5 @@
 package nukem.chatroom.dto.chatroom;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -12,7 +11,6 @@ import nukem.chatroom.model.user.User;
 @Setter
 @Builder
 @EqualsAndHashCode
-@JsonInclude(JsonInclude.Include.NON_NULL)
 public class ChatRoomMemberDto {
 
     private Long id;

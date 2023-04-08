@@ -44,14 +44,14 @@ public class MessageServiceImpl implements MessageService {
 
     @Override
     @Transactional(readOnly = true)
-    public Page<Message> getUserMessagesOrderByIdDesc(final Pageable pageRequest) {
-        return messageRepository.findAllByUserIdOrderByIdDesc(authService.getCurrentUser().getId(), pageRequest);
+    public Page<Message> getUserMessagesOrderByIdDesc(final Pageable pageable) {
+        return messageRepository.findAllByUserIdOrderByIdDesc(authService.getCurrentUser().getId(), pageable);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public Page<MessageDto> getMessagesByChatRoomId(final Long chatRoomId, final Pageable pageRequest) {
-        return messageRepository.findAllByChatRoomIdOrderByIdDesc(chatRoomId, pageRequest).map(MessageDto::toDto);
+    public Page<MessageDto> getMessagesByChatRoomId(final Long chatRoomId, final Pageable pageable) {
+        return messageRepository.findAllByChatRoomId(chatRoomId, pageable).map(MessageDto::toDto);
     }
 
     @Override

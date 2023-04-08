@@ -5,8 +5,11 @@ import nukem.chatroom.dto.MessageDto;
 import nukem.chatroom.dto.request.SendMessageRequest;
 import nukem.chatroom.model.Message;
 import nukem.chatroom.service.MessageService;
+import nukem.chatroom.utils.OffsetBasedPageRequest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -25,9 +28,10 @@ public class MessageController {
 
     @GetMapping("/chatrooms/{chatRoomId}/messages")
     public ResponseEntity<Page<MessageDto>> getMessagesInRoom(@PathVariable Long chatRoomId,
-                                                              @RequestParam(defaultValue = "0") Integer page,
+                                                              @RequestParam(defaultValue = "0") Integer offset,
                                                               @RequestParam(defaultValue = "15") Integer size) {
-        return ResponseEntity.ok(messageService.getMessagesByChatRoomId(chatRoomId, PageRequest.of(page, size)));
+        final Pageable pageable = new OffsetBasedPageRequest(offset, size, Sort.by("date").descending());
+        return ResponseEntity.ok(messageService.getMessagesByChatRoomId(chatRoomId, pageable));
     }
 
     @PostMapping("/chatrooms/{chatRoomId}/messages")

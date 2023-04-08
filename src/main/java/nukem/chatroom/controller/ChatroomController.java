@@ -8,6 +8,7 @@ import nukem.chatroom.dto.request.CreateRoomRequest;
 import nukem.chatroom.service.ChatRoomService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -22,7 +23,8 @@ public class ChatroomController {
     public ResponseEntity<Page<ChatRoomShortDto>> getChatRooms(@RequestParam(required = false) String name,
                                                                @RequestParam(defaultValue = "0") Integer page,
                                                                @RequestParam(defaultValue = "15") Integer size) {
-        return ResponseEntity.ok().body(chatRoomService.findAllChatRoomsByFilterParams(name, PageRequest.of(page, size)));
+        final PageRequest pageRequest = PageRequest.of(page, size, Sort.by("id").descending());
+        return ResponseEntity.ok().body(chatRoomService.findAllChatRoomsByFilterParams(name, pageRequest));
     }
 
     @PostMapping

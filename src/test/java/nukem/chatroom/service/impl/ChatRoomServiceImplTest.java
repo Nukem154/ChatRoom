@@ -15,10 +15,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.*;
 
 import java.util.HashSet;
 import java.util.List;
@@ -99,13 +96,13 @@ class ChatRoomServiceImplTest {
     @Test
     void findAllChatRoomsByFilterParamsTest() {
         final String name = "Test Room";
-        final Pageable pageRequest = PageRequest.of(0, 10);
+        final Pageable pageRequest = PageRequest.of(0, 10, Sort.by("id").descending());
         final List<ChatRoom> chatRooms = List.of(
                 ChatRoom.builder().id(1L).name("Test Room 1").description("This is test room 1").build(),
                 ChatRoom.builder().id(2L).name("Test Room 2").description("This is test room 2").build()
         );
 
-        when(chatRoomRepository.findAllByNameContainingOrderByIdDesc(name, pageRequest))
+        when(chatRoomRepository.findAllByNameContaining(name, pageRequest))
                 .thenReturn(new PageImpl<>(chatRooms, pageRequest, chatRooms.size()));
 
         final Page<ChatRoomShortDto> result = chatRoomService.findAllChatRoomsByFilterParams(name, pageRequest);

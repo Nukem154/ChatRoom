@@ -93,11 +93,11 @@ public class ChatRoomServiceImpl implements ChatRoomService {
 
     @Override
     @Transactional(readOnly = true)
-    public Page<ChatRoomShortDto> findAllChatRoomsByFilterParams(final String name, final Pageable pageRequest) {
+    public Page<ChatRoomShortDto> findAllChatRoomsByFilterParams(final String name, final Pageable pageable) {
         if (name != null) {
-            return chatRoomRepository.findAllByNameContainingOrderByIdDesc(name, pageRequest).map(ChatRoomShortDto::toDto);
+            return chatRoomRepository.findAllByNameContaining(name, pageable).map(ChatRoomShortDto::toDto);
         }
-        return chatRoomRepository.findAllByOrderByIdDesc(pageRequest).map(ChatRoomShortDto::toDto);
+        return chatRoomRepository.findAll(pageable).map(ChatRoomShortDto::toDto);
     }
 
     public static String getChatRoomTopic(final Long chatRoomId) {

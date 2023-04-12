@@ -35,12 +35,12 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public User createUser(final RegisterRequest request) {
-        validateRequest(request);
+        validateRegisterRequest(request);
         checkIfUsernameAvailable(request.username());
         return userRepository.save(createUserFromRequest(request));
     }
 
-    private void validateRequest(final RegisterRequest request) {
+    private void validateRegisterRequest(final RegisterRequest request) {
         if (StringUtils.isEmpty(request.username()) || StringUtils.isEmpty(request.password())) {
             throw new IllegalArgumentException(PASSWORD + SLASH + USERNAME + CANNOT_BE_EMPTY);
         }

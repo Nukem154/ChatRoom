@@ -35,31 +35,36 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public User createUser(final RegisterRequest request) {
-        final String username = request.username();
-        final String password = request.password();
+        validateRequest(request);
+        checkIfUsernameAvailable(request.username());
+        return userRepository.save(createUserFromRequest(request));
+    }
 
-        if (StringUtils.isEmpty(username) || StringUtils.isEmpty(password)) {
+    private void validateRequest(final RegisterRequest request) {
+        if (StringUtils.isEmpty(request.username()) || StringUtils.isEmpty(request.password())) {
             throw new IllegalArgumentException(PASSWORD + SLASH + USERNAME + CANNOT_BE_EMPTY);
         }
+    }
 
+    private void checkIfUsernameAvailable(final String username) {
         userRepository.findByUsername(username).ifPresent((u) -> {
             throw new UserAlreadyExistsException(username);
         });
+    }
 
-        final User user = User.builder()
-                .username(username)
-                .password(passwordEncoder.encode(password))
+    private User createUserFromRequest(final RegisterRequest request) {
+        return User.builder()
+                .username(request.username())
+                .password(passwordEncoder.encode(request.password()))
                 .roles(Collections.singleton(Role.ROLE_USER))
                 .build();
-
-        return userRepository.save(user);
     }
 
     @Override
     @Transactional
-    public String updateAvatar(final MultipartFile file) {
+    public String updateAvatar(final MultipartFile avatarImage) {
         final User user = authService.getCurrentUser();
-        final String avatarUrl = awsService.uploadToAWS(file);
+        final String avatarUrl = awsService.uploadAvatarToAWS(avatarImage);
         final Avatar avatar = Avatar.builder()
                 .url(avatarUrl)
                 .user(user)

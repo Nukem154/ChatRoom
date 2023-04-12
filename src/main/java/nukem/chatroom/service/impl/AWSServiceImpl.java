@@ -12,27 +12,25 @@ import nukem.chatroom.service.AuthService;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.net.URL;
-
 @Service
 @RequiredArgsConstructor
 public class AWSServiceImpl implements AWSService {
+    private static final String AWS_S3_BUCKET_NAME = "nukem-chatroom";
+    public static final String AVATAR_SUFFIX = "_AVATAR";
 
     private final AmazonS3 s3Client;
     private final AuthService authService;
 
     @SneakyThrows
     @Override
-    public String uploadToAWS(final MultipartFile multipartFile) {
-        final String imageBucket = "nukem-chatroom";
-        final String key = authService.getCurrentUser().getUsername() + "_AVATAR";
+    public String uploadAvatarToAWS(final MultipartFile multipartFile) {
+        final String key = authService.getCurrentUser().getUsername() + AVATAR_SUFFIX;
         final ObjectMetadata metadata = new ObjectMetadata();
         metadata.setContentType(multipartFile.getContentType());
-        final PutObjectRequest putObjectRequest = new PutObjectRequest(imageBucket, key, multipartFile.getInputStream(), metadata);
+        final PutObjectRequest putObjectRequest = new PutObjectRequest(AWS_S3_BUCKET_NAME, key, multipartFile.getInputStream(), metadata);
         try {
             s3Client.putObject(putObjectRequest);
-            final URL url = s3Client.getUrl(imageBucket, key);
-            return url.toString();
+            return s3Client.getUrl(AWS_S3_BUCKET_NAME, key).toString();
         } catch (AmazonServiceException ase) {
             // handle AmazonServiceException errors
             throw new RuntimeException(ase);

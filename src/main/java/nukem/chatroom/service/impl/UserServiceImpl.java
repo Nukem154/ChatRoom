@@ -19,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Collections;
+import java.util.List;
 
 import static nukem.chatroom.constants.Constants.*;
 
@@ -78,5 +79,11 @@ public class UserServiceImpl implements UserService {
     @Transactional(readOnly = true)
     public User getUserByUsername(final String username) {
         return userRepository.findByUsername(username).orElseThrow(() -> new UserNotFoundException(username));
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<User> getUsersByUsernames(final List<String> usernames) {
+        return userRepository.findByUsernameIn(usernames);
     }
 }

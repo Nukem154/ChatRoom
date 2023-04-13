@@ -20,9 +20,9 @@ import org.springframework.messaging.simp.user.SimpUserRegistry;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -63,32 +63,32 @@ public class ChatRoomServiceImpl implements ChatRoomService {
     public ChatRoomDetailedDto getChatRoomInfo(final Long id) {
         final ChatRoom chatRoom = getChatRoomById(id);
         final ChatRoomDetailedDto chatRoomDetailedDto = ChatRoomDetailedDto.toDto(chatRoom);
-        chatRoomDetailedDto.setActiveUsers(getActiveUsersDto(chatRoom));
+        chatRoomDetailedDto.setActiveUsers(getActiveUsersInChatRoom(chatRoom));
         return chatRoomDetailedDto;
     }
 
-    private List<ChatRoomMemberDto> getActiveUsersDto(final ChatRoom chatRoom) {
-        final List<ChatRoomMemberDto> activeUsers = getActiveUsersInRoom(chatRoom.getId()).stream()
-                .map(username -> ChatRoomMemberDto.toDto(userService.getUserByUsername(username)))
-                .collect(Collectors.toList());
+    private List<ChatRoomMemberDto> getActiveUsersInChatRoom(final ChatRoom chatRoom) {
+        final Map<String, ChatRoomMemberDto> userDtoMap =
+                userService.getUsersByUsernames(getChatRoomWebsocketSubscribers(chatRoom.getId()))
+                        .stream()
+                        .map(ChatRoomMemberDto::toDto)
+                        .collect(Collectors.toMap(ChatRoomMemberDto::getUsername, Function.identity()));
 
-        final Map<String, ChatRoomMemberDto> userDtoMap = activeUsers.stream()
-                .collect(Collectors.toMap(ChatRoomMemberDto::getUsername, Function.identity()));
+        chatRoom.getVideoStreams().forEach(stream ->
+                userDtoMap.computeIfPresent(stream.getUser().getUsername(), (username, userDto) -> {
+                    userDto.setStream(VideoStreamDto.toDto(stream));
+                    return userDto;
+                }));
 
-        chatRoom.getVideoStreams().forEach(stream -> {
-            ChatRoomMemberDto userDto = userDtoMap.get(stream.getUser().getUsername());
-            if (userDto != null) {
-                userDto.setStream(VideoStreamDto.toDto(stream));
-            }
-        });
-        return activeUsers;
+        return new ArrayList<>(userDtoMap.values());
     }
 
-    protected Set<String> getActiveUsersInRoom(final Long roomId) {
+    protected List<String> getChatRoomWebsocketSubscribers(final Long roomId) {
         return userRegistry.findSubscriptions(subscription -> subscription.getDestination().equals(getChatRoomTopic(roomId)))
                 .stream()
                 .map(subscription -> subscription.getSession().getUser().getName())
-                .collect(Collectors.toSet());
+                .distinct()
+                .collect(Collectors.toList());
     }
 
     @Override

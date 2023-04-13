@@ -20,7 +20,6 @@ import org.springframework.data.domain.*;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -75,13 +74,15 @@ class ChatRoomServiceImplTest {
                 .videoStreams(new HashSet<>())
                 .owner(owner)
                 .build();
-        final Set<String> activeUsers = Set.of("user1", "user2");
+        final List<String> activeUsersUsernames = List.of("user1", "user2");
+        final List<User> activeUsers = activeUsersUsernames
+                .stream()
+                .map((username) -> User.builder().username(username).build())
+                .toList();
 
         when(chatRoomRepository.findById(roomId)).thenReturn(Optional.of(chatRoom));
-        doReturn(activeUsers).when(chatRoomService).getActiveUsersInRoom(roomId);
-        for (String username : activeUsers) {
-            when(userService.getUserByUsername(username)).thenReturn(User.builder().username(username).build());
-        }
+        doReturn(activeUsersUsernames).when(chatRoomService).getChatRoomWebsocketSubscribers(roomId);
+        when(userService.getUsersByUsernames(activeUsersUsernames)).thenReturn(activeUsers);
 
         final ChatRoomDetailedDto result = chatRoomService.getChatRoomInfo(roomId);
 
@@ -89,8 +90,8 @@ class ChatRoomServiceImplTest {
         assertEquals(chatRoom.getName(), result.getName());
         assertEquals(chatRoom.getDescription(), result.getDescription());
         assertEquals(owner.getUsername(), result.getOwner());
-        assertEquals(activeUsers.size(), result.getActiveUsers().size());
-        assertTrue(result.getActiveUsers().stream().map(ChatRoomMemberDto::getUsername).allMatch(activeUsers::contains));
+        assertEquals(activeUsersUsernames.size(), result.getActiveUsers().size());
+        assertTrue(result.getActiveUsers().stream().map(ChatRoomMemberDto::getUsername).allMatch(activeUsersUsernames::contains));
     }
 
     @Test

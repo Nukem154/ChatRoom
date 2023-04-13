@@ -5,6 +5,8 @@ import nukem.chatroom.exception.UserAlreadyExistsException;
 import nukem.chatroom.model.user.User;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.List;
+
 /**
  * This service provides methods for managing user-related functionality.
  */
@@ -28,4 +30,6 @@ public interface UserService {
     String updateAvatar(MultipartFile file);
 
     User getUserByUsername(String username);
+
+    List<User> getUsersByUsernames(List<String> usernames);
 }

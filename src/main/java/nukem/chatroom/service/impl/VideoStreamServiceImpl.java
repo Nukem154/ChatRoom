@@ -39,10 +39,7 @@ public class VideoStreamServiceImpl implements VideoStreamService {
     public VideoStreamDto startStream(final Long chatRoomId) {
         final User currentUser = authService.getCurrentUser();
 
-        streamRepository.findByUserUsername(currentUser.getUsername()).ifPresent((stream) -> {
-                    throw new VideoStreamAlreadyInLiveStateException();
-                }
-        );
+        checkIfUserNotStreaming(currentUser);
 
         final VideoStream videoStream = VideoStream.builder()
                 .chatRoom(chatRoomService.getChatRoomById(chatRoomId))
@@ -53,6 +50,13 @@ public class VideoStreamServiceImpl implements VideoStreamService {
                 currentUser.getUsername(), EventType.STREAM_STARTED_EVENT);
 
         return VideoStreamDto.toDto(streamRepository.save(videoStream));
+    }
+
+    private void checkIfUserNotStreaming(User currentUser) {
+        streamRepository.findByUserUsername(currentUser.getUsername()).ifPresent((stream) -> {
+                    throw new VideoStreamAlreadyInLiveStateException();
+                }
+        );
     }
 
     @Override

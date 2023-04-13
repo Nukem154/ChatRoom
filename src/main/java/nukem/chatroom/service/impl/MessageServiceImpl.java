@@ -101,7 +101,7 @@ public class MessageServiceImpl implements MessageService {
     }
 
     private void verifyMessageOwnership(final Message message) {
-        if (authService.getCurrentUser() != message.getUser()) {
+        if (!authService.getCurrentUser().equals(message.getUser())) {
             throw new AccessDeniedException(YOU_CAN_EDIT_DELETE_ONLY_YOUR_MESSAGES);
         }
     }
